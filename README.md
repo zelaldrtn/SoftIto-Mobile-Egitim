@@ -5,3 +5,5 @@
 2
 4
 6
+
+işe yarar ve kullanıcıların severek kullanacağı pratik uygulamalar geliştirmek istiyorum
