@@ -212,6 +212,7 @@ body {
     background-color: #333;
 }
 
+/*ekran genişliği 480px veya daha küçükse boyutları ona göre ayarla.*/
 @media (max-width: 480px) {
 
     .urun-resmi {
