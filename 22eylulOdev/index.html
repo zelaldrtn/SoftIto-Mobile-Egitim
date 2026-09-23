@@ -5,232 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Karaca Hatır Perfetto</title>
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
 
-        body {
-            font-family: Georgia, 'Times New Roman', Times, serif;
-            background-color: #72151522;
-            color: rgb(0, 0, 0);
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-
-        .phone-container {
-            width: 100%;
-            max-width: 420px;
-            min-height: 100vh;
-            background: #ffffff;
-            overflow: hidden;
-            border: 1px solid #6f869f;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-            padding-bottom: 75px;
-        }
-
-        .quick-actions {
-            position: sticky;
-            top: 0;
-            z-index: 10;
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 10px 12px;
-            background: #0a0634;
-            border-bottom: 1px solid #e5dcca;
-        }
-
-        .action-btn {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: white;
-            border: 1px solid #ddd4c5;
-            border-radius: 12px;
-            padding: 7px 12px;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        }
-
-        .action-btn:hover .icon-circle {
-            transform: translateY(-2px);
-        }
-
-        .icon-circle {
-            width: 34px;
-            height: 34px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background-color: #a9b7c6;
-            font-size: 18px;
-            transition: 0.2s;
-        }
-
-        .urun-resmi {
-            position: relative;
-            width: 100%;
-            height: 350px;
-            background-color: white;
-            overflow: hidden;
-        }
-
-        .urun-resmi img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            border-radius: 15px;
-        }
-
-        .indirim {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: #d94a4a;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .kargo {
-            position: absolute;
-            top: 48px;
-            left: 12px;
-            background: #4f8a5b;
-            color: white;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-
-        .favori {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 42px;
-            height: 42px;
-            border: none;
-            color: #d94a4a;
-            border-radius: 50%;
-            background: white;
-            font-size: 25px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
-        }
-
-        .urun-resmi+p {
-            /* ürün resmi divinden hemen sonra gelen p */
-            font-size: 21px;
-            font-weight: bold;
-            margin-top: 18px;
-            padding: 0 16px;
-        }
-
-        .satici {
-            font-size: 14px;
-            color: #666;
-            margin-top: 6px;
-            padding: 0 16px;
-        }
-
-        .renk {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 80;
-            margin-top: 18px;
-            padding: 0 16px;
-        }
-
-        .chip {
-            background: #a9b7c6;
-            padding: 9px 16px;
-            border-radius: 20px;
-            border: 1px solid #cbd5e1;
-            font-size: 14px;
-            font-weight: 500;
-            color: #334115;
-            transition: 0.2s;
-        }
-        .chip:hover{
-            background-color: #a9b7c6;
-            transform: translateY(-2px);
-        }
-
-        .tutar-sepet {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 420px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            background-color: rgb(16, 14, 25);
-            border-top: 1px solid #ddd4c5;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.12);
-            z-index: 20;
-        }
-
-        .tutar {
-            font-size: 20px;
-            font-weight: bold;
-            color: #f2f1f1;
-        }
-
-        .sepete-ekle {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 10px;
-            background-color: #838383;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        @media (max-width: 480px) {
-            body {
-                background-color: white;
-            }
-            .phone-container {
-                width: 100%;
-                max-width: 420px;
-
-                border: none;
-                box-shadow: none;
-            }
-            .urun-resmi {
-                height: 320px;
-            }
-            .urun-resmi+p {
-                font-size: 19px;
-            }
-            .tutar {
-                font-size: 18px;
-            }
-            .sepete-ekle {
-                padding: 11px 18px;
-                font-size: 14px;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
@@ -252,6 +28,16 @@
             <button class="favori">♡</button>
         </div>
         <p>Karaca Hatır Perfetto</p>
+        <div class="aciklama-kutusu">
+            <p class="aciklma-baslik">
+                Ürün Açıklaması
+            </p>
+            <p class="aciklama">
+                Karaca Hatır Perfetto Espresso ve Türk Kahvesi Makinesi — Inox
+                Dünyada İlk Kez: Türk Kahvesi ve Espresso Aynı Anda, Tek Cihazda
+                Karaca Hatır Perfetto, kahve deneyimini yeniden tanımlayan özel bir tasarımla geliştirildi.
+            </p>
+        </div>
         <p class="satici">Satıcı: KARACA</p>
 
         <div class="renk">
