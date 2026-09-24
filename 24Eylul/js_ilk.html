@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS ilk ders</title>
+</head>
+
+<body>
+    <script>
+        // //1. Var Felaketi. Süslü parantez dinlemez doşarıya sızar.
+        // if(true){
+        //     var tehlikeliSayi=999;
+        // }
+        // console.log("var sızdı mı?", tehlikeliSayi); //true göndermememe rağmen çıktıda sayı geldi.
+
+        // //2. durum let ve const kalaknı: süslü parantez bir oda çıkış yasak. çıkamaz
+        // if(true){
+        //     let guvenliSayi=42;
+        //     const PI = 2.1415;
+        //     console.log("oda içi", guvenliSayi,PI); //       
+        // }
+        // console.warn(guvenliSayi); //guvenliSayi is not defined hatası geld,
+
+        // //Veri tipleri ve Tip dönüşümü
+        // const isim="Selahaddin";    //string
+        // const bataryaKapasite=88.5; //number (float/int ayrım almıyor) 
+        // const sarjTamamlandi =false;    //boolean
+        // let sonrakiRandevu;     //undefined (kutu var içi boş)
+        // const servisNotu=null;  //null biliçli olrk boş bırkln değer
+        // const buyukSayi=543189765123156n;   //bigInt
+        // const gizliAnahtar=Symbol("id");     Symbol
+
+        // console.log(typeof isim);
+        // console.log(typeof bataryaKapasite);
+        // console.log(typeof sarjTamamlandi);
+        // console.log(typeof sonrakiRandevu);
+        // console.log(typeof servisNotu); //object yazar çünkü ne olduğunu bilmiyor ama bi object var diyor
+
+        //OTOMATİK TİP ÇEVRİMİ
+        // console.log("5"+2); //otomatik string olrk çevirir 52 olrk çıkar
+        // console.log("5"-2);  // - işareti stringi zorla sayıya çevirir cevap 3 olur
+        // // + işareti metin birleştirme yapar - işareti stringi zorla sayıya çevirir.
+
+        // console.log("5"*"4"); //20 çıkar çünkü çarpma da direkt matematiksel ifade old için çarpar.
+        // console.log("beş"*2); // NaN (Not a Number) hatası
+
+        // console.log(typeof NaN);
+        // console.log(NaN==NaN);  //false çıkar NEDEN??
+
+        // console.log(Number.isNaN(NaN)); //eşit
+
+
+
+        //manuel Tip Dönüştürme  (profesyonel yolu)
+        // const stringFiyat="1473.33";
+        // const sayiFiyat=Number(stringFiyat);
+        // const pixelDegeri=parseInt("48px",10);
+        // const metinSayi=String(2026);
+
+        // console.log(stringFiyat);
+        // console.log(sayiFiyat);
+        // console.log(pixelDegeri);
+        // console.log(metinSayi);
+
+        //Katı Eşitlik 
+        //neden her zaman === kullanmalıyız  (hem tip hem değer karşılaştırması yaapr)
+        // console.log(5=="5"); //true Çıkar --> (gevşek eşitlik. Tipi zorla çevirir ASLA kullanma)
+        // console.log(5==="5"); //false
+        // console.log(0==false); //true (gevşek eşitlik felaket)
+        // console.log(0===false); 
+        // console.log(null==undefined); //true
+        // console.log(null===undefined); //false
+
+        // const kullanici="esra ergün";
+        // const bakiye=1000;
+        // const harcama=10000;
+
+        // const eskiMesaj="Ssyın " + kullanici + ", kalan bakiyeniz:" + (bakiye-harcama)
+        // console.log(eskiMesaj);
+
+        // const modernMesaj=`Sayın ${kullanici}, bugünkü harcamanız: ${harcama}. 
+        // Kalan bakiyeniz: ${bakiye-harcama}`;
+        // console.log(modernMesaj);
+
+
+        // const bataryaSeviyesi=14;
+        // const istasyonUygunmu=true;
+        // const bakiyeTL=450;
+        // const minGirisTutari=200;
+
+        // if(!istasyonUygunmu){
+        //     console.log("istasyon şuan servis dışı veya meşgul");
+        // }else if(bakiyeTL<minGirisTutari){
+        //     console.log(`bakiye teresiz en az ${minGirisTutari} gerekli. Mevcut
+        //     bakiye: ${bakiyeTL}`);
+        // }else if(bataryaSeviyesi<=20){
+        //     console.log("kritik seviye ultra huzlı dc şarj moduna geçiliyor");
+        // }else{
+        //     console.log("standart şarj başlatılabilir.")
+        // }
+
+
+
+
+        //js de şu 6 değer false olarak kabul edilir
+        //--> false,0,"",null,undefined,NaN 
+        //bunun dışındaki HERŞEY [] boş dizi olarak true kabul edielir.
+
+        // const kullaniciGirdisi=0;
+        // if(kullaniciGirdisi){
+        //     console.log("girdi dolu")
+        // }else{
+        //     console.log("girdi boş")
+        // }
+
+
+
+        //kosul?dogruysa_deger : yanlissa_deger
+        // const soketDurumu="mesgul";
+        // const durumMesaji=soketDurumu==="uygun" ?"soket boşta":"soket kullanımda";
+        // console.log(durumMesaji);
+
+
+        //arrow functtion
+
+        //klasik fonk
+        function toplaKlasik(sayi1, sayi2) {
+            return sayi1 + sayi2;
+        }
+
+        //modern fonk (es6 standartlarıyla)
+        const toplaModern = (sayi1, sayi2) => {
+            return sayi1 + sayi2
+        }
+
+        //tek satırlık fok arrow
+        const toplaKisa = (sayi1, sayi2) => sayi1 + sayi2;
+
+        //tek parametreli
+        const kareAl = sayi => sayi * sayi;
+
+        const profilUret=(ad,rol)=>({
+            ad:ad,
+            rol:rol,
+            kayitTarihi:2026
+        });
+
+        console.log("toplama sonucu", toplaModern(15,27));
+        console.log(kareAl(9));
+
+
+        //indirimli sepet tutarı hesaplayıcı (kullanıcı girdisi)
+        const indirimliTutar=(tutar,indirim) => tutar-(tutar*(indirim/100));
+
+        //şarj süresi tahmin motoruvdk cinsinden verilcek değerler: mevcut yüzde hedef yüzde batarya kw istasyon kw
+        
+
+
+    </script>
+</body>
+
+</html>
