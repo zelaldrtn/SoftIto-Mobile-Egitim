@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GARDIROPİA - İkinci El</title>
+    <style>
+        :root {
+            --arka-plan: #fffaf7;
+            --kart: #ffffff;
+            --yazi: #49434b;
+            --acik-yazi: #938a91;
+            --kenarlik: #eee3e0;
+            --pembe: #efc1cf;
+            --pembe-koyu: #d994ad;
+            --lila: #d8cbea;
+            --yesil: #cbe0d1;
+            --sari: #f4e2ad;
+            --mavi: #c9dfe8;
+            --font: Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--arka-plan);
+            color: var(--yazi);
+            font-family: var(--font);
+            line-height: 1.5;
+            padding: 0 20px 40px;
+        }
+
+        .site {
+            max-width: 1150px;
+            margin: 0 auto;
+        }
+
+        .ust-menu {
+            min-height: 82px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--kenarlik);
+        }
+
+        .logo-alan {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .logo-alt {
+            font-size: 10px;
+            color: var(--acik-yazi);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .ust-sag {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .ilan-sayisi {
+            font-size: 12px;
+            color: var(--acik-yazi);
+        }
+
+        .ilan-sayisi strong {
+            color: var(--yazi);
+        }
+
+        .ilan-ver {
+            text-decoration: none;
+            display: inline-block;
+            background: var(--pembe);
+            color: #58434b;
+            padding: 10px 17px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .ilan-ver:hover {
+            background: var(--pembe-koyu);
+            color: white;
+        }
+
+        .hero {
+            margin-top: 25px;
+            min-height: 280px;
+            padding: 38px;
+            border-radius: 25px;
+            background: linear-gradient(110deg, #f8dde5, #eee7f8);
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            overflow: hidden;
+        }
+
+        .hero-yazi {
+            max-width: 600px;
+        }
+
+        .hero-etiket {
+            font-size: 10px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: var(--pembe-koyu);
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            line-height: 1.08;
+            margin: 8px 0 12px;
+            letter-spacing: -1.5px;
+        }
+
+        .hero p {
+            color: #766d75;
+            font-size: 14px;
+        }
+
+        .hero-kutu {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            padding: 18px 22px;
+            border-radius: 18px;
+            min-width: 190px;
+        }
+
+        .hero-kutu span {
+            display: block;
+            font-size: 11px;
+            color: var(--acik-yazi);
+            margin-bottom: 4px;
+        }
+
+        .hero-kutu strong {
+            font-size: 22px;
+        }
+
+        .ilan-form-alani {
+            margin: 25px 0;
+            background: #f5edf8;
+            border: 1px solid var(--kenarlik);
+            border-radius: 22px;
+            padding: 25px;
+        }
+
+        .form-baslik {
+            margin-bottom: 18px;
+        }
+
+        .form-baslik h2 {
+            font-size: 22px;
+            margin-top: 4px;
+        }
+
+        .form-baslik p {
+            color: var(--acik-yazi);
+            font-size: 12px;
+            margin-top: 3px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 13px;
+        }
+
+        .alan {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .alan label {
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .alan input,
+        .alan select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--kenarlik);
+            border-radius: 10px;
+            background: #fffaf9;
+            color: var(--yazi);
+            outline: none;
+            font-size: 12px;
+        }
+
+        .alan input:focus,
+        .alan select:focus {
+            border-color: var(--pembe);
+        }
+
+        .ilan-yayinla {
+            width: 100%;
+            border: none;
+            background: var(--pembe);
+            color: #58434b;
+            padding: 12px;
+            border-radius: 11px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 17px;
+            cursor: pointer;
+        }
+
+        .ilan-yayinla:hover {
+            background: var(--pembe-koyu);
+            color: white;
+        }
+
+        .arama-alani {
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            gap: 15px;
+            margin-bottom: 18px;
+        }
+
+        .liste-etiket {
+            font-size: 10px;
+            color: var(--pembe-koyu);
+            font-weight: bold;
+            letter-spacing: 1.5px;
+        }
+
+        .arama-alani h2 {
+            font-size: 27px;
+            margin-top: 2px;
+        }
+
+        .arama-kutu {
+            flex: 1;
+            max-width: 290px;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            background: white;
+            border: 1px solid var(--kenarlik);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+
+        .arama-kutu span {
+            font-size: 18px;
+            color: var(--acik-yazi);
+        }
+
+        .arama-kutu input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 12px;
+            color: var(--yazi);
+        }
+
+        .kategori-filter {
+            border: 1px solid var(--kenarlik);
+            background: white;
+            color: var(--yazi);
+            padding: 10px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            outline: none;
+        }
+
+        .ilan-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .ilan-kart {
+            background: var(--kart);
+            border: 1px solid var(--kenarlik);
+            border-radius: 18px;
+            overflow: hidden;
+            transition: 0.2s;
+        }
+
+        .ilan-kart:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(80, 60, 70, 0.09);
+        }
+
+        .ilan-foto-alani {
+            position: relative;
+            background: #f8efef;
+        }
+
+        .ilan-foto {
+            width: 100%;
+            height: 205px;
+            display: block;
+            object-fit: cover;
+        }
+
+        .kategori-etiketi {
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            background: rgba(255, 255, 255, 0.92);
+            padding: 5px 8px;
+            border-radius: 9px;
+            font-size: 9px;
+            font-weight: bold;
+        }
+
+        .ilan-bilgi {
+            padding: 13px;
+        }
+
+        .ilan-durum {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 9px;
+            margin-bottom: 7px;
+            background: var(--sari);
+        }
+
+        .ilan-bilgi h3 {
+            font-size: 15px;
+            margin-bottom: 8px;
+            min-height: 23px;
+        }
+
+        .ilan-alt {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .ilan-fiyat {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .ilan-konum {
+            font-size: 10px;
+            color: var(--acik-yazi);
+            margin-top: 5px;
+        }
+
+        .sil-butonu {
+            border: none;
+            background: #fae4e4;
+            color: #aa6767;
+            padding: 6px 9px;
+            border-radius: 8px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .sil-butonu:hover {
+            background: #e7abab;
+            color: white;
+        }
+
+        .bos-mesaj {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 55px 20px;
+            background: white;
+            border: 1px dashed var(--kenarlik);
+            border-radius: 18px;
+            color: var(--acik-yazi);
+            font-size: 13px;
+        }
+
+        .mini-istatistikler {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .mini-kart {
+            background: white;
+            border: 1px solid var(--kenarlik);
+            border-radius: 14px;
+            padding: 15px;
+        }
+
+        .mini-kart span {
+            display: block;
+            font-size: 10px;
+            color: var(--acik-yazi);
+        }
+
+        .mini-kart strong {
+            font-size: 19px;
+        }
+
+        @media (max-width: 950px) {
+            .ilan-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 720px) {
+            body {
+                padding: 0 14px 30px;
+            }
+
+            .ust-menu,
+            .arama-alani {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .ust-menu {
+                padding: 15px 0;
+            }
+
+            .hero {
+                min-height: auto;
+                padding: 25px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 25px;
+            }
+
+            .hero h1 {
+                font-size: 31px;
+            }
+
+            .hero-kutu {
+                width: 100%;
+            }
+
+            .arama-kutu {
+                width: 100%;
+                max-width: none;
+            }
+
+            .kategori-filter {
+                width: 100%;
+            }
+
+            .ilan-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .mini-istatistikler {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 450px) {
+            .ilan-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="site">
+        <header class="ust-menu">
+            <div class="logo-alan">
+                <span class="logo">GARDIROPİA</span>
+                <span class="logo-alt">ikinci el, yeni hikâyeler</span>
+            </div>
+            <div class="ust-sag">
+                <span class="ilan-sayisi"><strong id="ilanSayisi">0</strong> ilan</span>
+                <a href="#ilan-ver" class="ilan-ver">+ İlan Ver</a>
+            </div>
+        </header>
+        <section class="hero">
+            <div class="hero-yazi">
+                <span class="hero-etiket">İKİNCİ EL PAZARI</span>
+                <h1>Kullanmadıkların<br>başkasının favorisi olabilir.</h1>
+                <p>Dolabında yer aç, eşyalarına yeni bir sahip bul.</p>
+            </div>
+            <div class="hero-kutu">
+                <span>Toplam ilan değeri</span>
+                <strong id="toplamTutar">0 ₺</strong>
+            </div>
+        </section>
+        <section id="ilan-ver" class="ilan-form-alani">
+            <div class="form-baslik">
+                <span class="hero-etiket">İLAN VER</span>
+                <h2>Bir ürününü satışa çıkar</h2>
+                <p>Artık kullanmadığın ürünlere yeni bir sahip bul.</p>
+            </div>
+            <form id="ilanForm">
+                <div class="form-grid">
+                    <div class="alan">
+                        <label for="urunAdi">Ürün adı</label>
+                        <input type="text" id="urunAdi" placeholder="Örneğin: Vintage kot ceket" required>
+                    </div>
+                    <div class="alan">
+                        <label for="urunKategori">Kategori</label>
+                        <select id="urunKategori">
+                            <option value="Giyim">Giyim</option>
+                            <option value="Elektronik">Elektronik</option>
+                            <option value="Ev">Ev</option>
+                            <option value="Kitap">Kitap</option>
+                            <option value="Aksesuar">Aksesuar</option>
+                        </select>
+                    </div>
+                    <div class="alan">
+                        <label for="urunDurum">Durum</label>
+                        <select id="urunDurum">
+                            <option value="Yeni gibi">Yeni gibi</option>
+                            <option value="Çok iyi">Çok iyi</option>
+                            <option value="İyi">İyi</option>
+                            <option value="Kullanıldı">Kullanıldı</option>
+                        </select>
+                    </div>
+                    <div class="alan">
+                        <label for="urunFiyat">Fiyat</label>
+                        <input type="number" id="urunFiyat" placeholder="750" min="1" required>
+                    </div>
+                    <div class="alan">
+                        <label for="urunKonum">Konum</label>
+                        <input type="text" id="urunKonum" placeholder="İstanbul">
+                    </div>
+                    <div class="alan">
+                        <label for="urunFoto">Fotoğraf yolu</label>
+                        <input type="text" id="urunFoto" placeholder="images/ceket.jpg">
+                    </div>
+                </div>
+                <button type="submit" class="ilan-yayinla">İlanı Yayınla</button>
+            </form>
+        </section>
+        <section class="arama-alani">
+            <div>
+                <span class="liste-etiket">YENİ EKLENENLER</span>
+                <h2>Keşfet</h2>
+            </div>
+            <div class="arama-kutu">
+                <span>⌕</span>
+                <input type="text" id="aramaInput" placeholder="Ne arıyorsun?">
+            </div>
+            <select id="kategoriFilter" class="kategori-filter">
+                <option value="ALL">Tüm Kategoriler</option>
+                <option value="Giyim">Giyim</option>
+                <option value="Elektronik">Elektronik</option>
+                <option value="Ev">Ev</option>
+                <option value="Kitap">Kitap</option>
+                <option value="Aksesuar">Aksesuar</option>
+            </select>
+        </section>
+        <main>
+            <div id="ilanContainer" class="ilan-grid"></div>
+        </main>
+        <section class="mini-istatistikler">
+            <div class="mini-kart">
+                <span>Aktif İlan</span>
+                <strong id="aktifIlan">0</strong>
+            </div>
+            <div class="mini-kart">
+                <span>Ortalama Fiyat</span>
+                <strong id="ortalamaFiyat">0 ₺</strong>
+            </div>
+        </section>
+    </div>
+    <script>
+        let ilanlar = [
+            {
+                id: 1,
+                name: "Vintage Kot Ceket",
+                category: "Giyim",
+                condition: "Çok iyi",
+                price: 850,
+                location: "İstanbul",
+                image: "images/ceket.jpg"
+            },
+            {
+                id: 2,
+                name: "Kablosuz Kulaklık",
+                category: "Elektronik",
+                condition: "Yeni gibi",
+                price: 1850,
+                location: "Ankara",
+                image: "images/kulaklik.jpg"
+            },
+            {
+                id: 3,
+                name: "Seramik Vazo",
+                category: "Ev",
+                condition: "İyi",
+                price: 420,
+                location: "Iğdır",
+                image: "images/vazo.jpg"
+            },
+            {
+                id: 4,
+                name: "Harry Potter Kitap Seti",
+                category: "Kitap",
+                condition: "İyi",
+                price: 650,
+                location: "İzmir",
+                image: "images/kitap.jpg"
+            }
+        ];
+
+        const ilanContainer = document.getElementById("ilanContainer");
+        const ilanForm = document.getElementById("ilanForm");
+        const aramaInput = document.getElementById("aramaInput");
+        const kategoriFilter = document.getElementById("kategoriFilter");
+        const ilanSayisi = document.getElementById("ilanSayisi");
+        const aktifIlan = document.getElementById("aktifIlan");
+        const toplamTutar = document.getElementById("toplamTutar");
+        const ortalamaFiyat = document.getElementById("ortalamaFiyat");
+
+        const istatistikleriGuncelle = (liste) => {
+            ilanSayisi.textContent = liste.length;
+            aktifIlan.textContent = liste.length;
+
+            if (liste.length === 0) {
+                toplamTutar.textContent = "0 ₺";
+                ortalamaFiyat.textContent = "0 ₺";
+                return;
+            }
+
+            const toplam = liste.reduce((acc, ilan) => acc + ilan.price, 0);
+
+            toplamTutar.textContent =
+                `${toplam.toLocaleString("tr-TR")} ₺`;
+
+            const ortalama = toplam / liste.length;
+
+            ortalamaFiyat.textContent =
+                `${Math.round(ortalama).toLocaleString("tr-TR")} ₺`;
+        };
+
+        const ilanlariGoster = () => {
+            const arama = aramaInput.value.toLowerCase().trim();
+            const secilenKategori = kategoriFilter.value;
+
+            const filtrelenmisIlanlar = ilanlar.filter((ilan) => {
+                const isimUygun =
+                    ilan.name.toLowerCase().includes(arama);
+
+                const kategoriUygun =
+                    secilenKategori === "ALL" ||
+                    ilan.category === secilenKategori;
+
+                return isimUygun && kategoriUygun;
+            });
+
+            ilanContainer.innerHTML = "";
+
+            if (filtrelenmisIlanlar.length === 0) {
+                ilanContainer.innerHTML = `
+            <div class="bos-mesaj">
+                Aradığın ilanı bulamadık.
+            </div>
+        `;
+
+                istatistikleriGuncelle([]);
+
+                return;
+            }
+
+            filtrelenmisIlanlar.forEach((ilan) => {
+                const kart = document.createElement("article");
+
+                kart.className = "ilan-kart";
+
+                kart.setAttribute("data-id", ilan.id);
+
+                kart.innerHTML = `
+            <div class="ilan-foto-alani">
+                <img
+                    class="ilan-foto"
+                    src="${ilan.image}"
+                    alt="${ilan.name}"
+                >
+                <span class="kategori-etiketi">
+                    ${ilan.category}
+                </span>
+            </div>
+            <div class="ilan-bilgi">
+                <span class="ilan-durum">
+                    ${ilan.condition}
+                </span>
+                <h3>${ilan.name}</h3>
+                <div class="ilan-alt">
+                    <div>
+                        <div class="ilan-fiyat">
+                            ${ilan.price.toLocaleString("tr-TR")} ₺
+                        </div>
+                        <div class="ilan-konum">
+                            ${ilan.location}
+                        </div>
+                    </div>
+                    <button
+                        class="sil-butonu"
+                        data-action="delete"
+                    >
+                        Sil
+                    </button>
+                </div>
+            </div>
+        `;
+
+                ilanContainer.appendChild(kart);
+            });
+
+            istatistikleriGuncelle(filtrelenmisIlanlar);
+        };
+
+        ilanContainer.addEventListener("click", (e) => {
+            if (e.target.dataset.action === "delete") {
+                const id =
+                    Number(
+                        e.target.closest(".ilan-kart").dataset.id
+                    );
+
+                ilanlar =
+                    ilanlar.filter(
+                        (ilan) => ilan.id !== id
+                    );
+
+                ilanlariGoster();
+            }
+        });
+
+        ilanForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+
+            const isim =
+                document.getElementById("urunAdi").value.trim();
+
+            const kategori =
+                document.getElementById("urunKategori").value;
+
+            const durum =
+                document.getElementById("urunDurum").value;
+
+            const fiyat =
+                Number(
+                    document.getElementById("urunFiyat").value
+                );
+
+            const konum =
+                document.getElementById("urunKonum").value.trim();
+
+            const fotograf =
+                document.getElementById("urunFoto").value.trim();
+
+            const yeniIlan = {
+                id: Date.now(),
+                name: isim,
+                category: kategori,
+                condition: durum,
+                price: fiyat,
+                location: konum,
+                image: fotograf
+            };
+
+            ilanlar.push(yeniIlan);
+
+            ilanForm.reset();
+
+            ilanlariGoster();
+        });
+
+        aramaInput.addEventListener(
+            "input",
+            ilanlariGoster
+        );
+
+        kategoriFilter.addEventListener(
+            "change",
+            ilanlariGoster
+        );
+
+        ilanlariGoster();
+    </script>
+</body>
+
+</html>
