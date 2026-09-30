@@ -8,7 +8,6 @@ enum CihazTipi { sensor, gateway, edgeServer, router }
 // IoT Cihaz Sınıfı
 
 class IoTCihaz {
-
   //! final: Bu bilgiler nesne oluşturulduktan sonra değiştirilemez.
   final String seriNo;
 
@@ -37,11 +36,9 @@ class IoTCihaz {
   //! Ödevde cihazın açık veya kapalı olduğunu kontrol etmek için ekledik.
   final bool acikMi;
 
-
   // Constructor
 
   IoTCihaz({
-
     //! required: Bu bilgiler cihaz oluşturulurken verilmek zorunda.
     required this.seriNo,
     required this.cihazAdi,
@@ -54,7 +51,6 @@ class IoTCihaz {
     this.acikMi = true,
   });
 
-
   // Güvenlik Açığı Kontrolü
 
   bool get guvenlikAcigiVarMi =>
@@ -64,24 +60,19 @@ class IoTCihaz {
       !sslSertifikasiGecerliMi || acikPortlar.contains("23/TELNET");
 }
 
-
 // Özel Exception sınıfı
 
 class CihazErisilemezException implements Exception {
-
   //! Hata olduğunda göstereceğimiz mesajı tutuyoruz.
   final String mesaj;
   CihazErisilemezException(this.mesaj);
 
   @override
-
   //! Exception ekrana yazdırıldığında mesajı göstermesini sağlıyor.
   String toString() => mesaj;
 }
 
-
 void main() {
-
   //! Dart programının başlangıç noktası.
   //! Program çalışınca ilk burası çalışır.
 
@@ -95,7 +86,6 @@ void main() {
     // 1. Cihaz
 
     IoTCihaz(
-
       seriNo: "SN-1001",
       cihazAdi: "Sicaklik Sensoru",
       //! Bu cihaz bir sensör.
@@ -109,12 +99,9 @@ void main() {
 
       //! SSL sertifikası geçerli.
       sslSertifikasiGecerliMi: true,
-
     ),
 
-
     // 2. Cihaz
-
     IoTCihaz(
       seriNo: "SN-1002",
       cihazAdi: "Ana Gateway",
@@ -192,11 +179,8 @@ void main() {
 
   //! Riskli cihazların her birini tek tek ekrana yazdırıyoruz.
   riskliCihazlar.forEach(
-    (cihaz) => print(
-      "* ${cihaz.cihazAdi} | CPU: %${cihaz.cpuYukYuzdesi}"
-    ),
+    (cihaz) => print("* ${cihaz.cihazAdi} | CPU: %${cihaz.cpuYukYuzdesi}"),
   );
-
 
   // fold() ile toplam bellek
 
@@ -245,18 +229,14 @@ void main() {
 ({String cihazAdi, CihazTipi tip, bool alarmDurumu}) cihazBilgisiBul(
   List<IoTCihaz> cihazlar,
   String seriNo,
-){
+) {
   //! where() ile seri numarası aradığımız seri numarasıyla aynı olan cihazı buluyoruz.
   //! Sonucu listeye çeviriyoruz.
-  final cihaz = cihazlar
-      .where((cihaz) => cihaz.seriNo == seriNo)
-      .toList();
+  final cihaz = cihazlar.where((cihaz) => cihaz.seriNo == seriNo).toList();
   //! Eğer liste boşsa aradığımız seri numarası bulunamamış demektir.
   if (cihaz.isEmpty) {
     //! Kendi oluşturduğumuz Exception'ı fırlatıyoruz.
-    throw CihazErisilemezException(
-      "Seri numarası bulunamadı: $seriNo",
-    );
+    throw CihazErisilemezException("Seri numarası bulunamadı: $seriNo");
   }
 
   //! Liste boş değilse ilk elemanı alıyoruz.
@@ -268,9 +248,8 @@ void main() {
     //! Cihazın güvenlik açığı varsa
     //! VEYA CPU'su %85'ten büyükse alarm true olacak.
     alarmDurumu:
-        bulunanCihaz.guvenlikAcigiVarMi ||
-        bulunanCihaz.cpuYukYuzdesi > 85.0,
-);
+        bulunanCihaz.guvenlikAcigiVarMi || bulunanCihaz.cpuYukYuzdesi > 85.0,
+  );
 }
 
 // Cihaz tipine göre izolasyon bölgesi belirleme
@@ -290,24 +269,15 @@ String izolasyonBolgesiBelirle(CihazTipi tip) {
   };
 }
 
-
 // Cihazın erişilebilir olup olmadığını kontrol eden metot
 
-void cihazErisimKontrolu(
-  List<IoTCihaz> cihazlar,
-  String seriNo,
-){
+void cihazErisimKontrolu(List<IoTCihaz> cihazlar, String seriNo) {
   //! Önce verilen seri numarasına sahip cihazı buluyoruz.
-  final cihaz = cihazlar
-      .where((cihaz) => cihaz.seriNo == seriNo)
-      .toList();
+  final cihaz = cihazlar.where((cihaz) => cihaz.seriNo == seriNo).toList();
   //! Eğer cihaz bulunamadıysa hata fırlatıyoruz.
   if (cihaz.isEmpty) {
-    throw CihazErisilemezException(
-      "Cihaz bulunamadı: $seriNo",
-    );
+    throw CihazErisilemezException("Cihaz bulunamadı: $seriNo");
   }
-
 
   //! Cihazın acikMi değeri false ise cihaz kapalıdır.
   //! Bu durumda cihaza erişilemez.
@@ -318,10 +288,7 @@ void cihazErisimKontrolu(
     );
   }
 
-
   //! Buraya kadar geldiyse cihaz bulunmuştur ve açıktır.
   //! Yani erişim başarılı demektir.
-  print(
-    "\n${cihaz.first.cihazAdi} cihazına erişim başarılı.",
-  );
+  print("\n${cihaz.first.cihazAdi} cihazına erişim başarılı.");
 }
