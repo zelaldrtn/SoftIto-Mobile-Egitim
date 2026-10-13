@@ -12,7 +12,7 @@ Future<void> fetchDashboardData() async {
     print("İsteklerden biri başarısız oldu $e");
   }
 }
-*/
+
 
 //Future : Tek bir kere veri çekeceğimiz zaman kullanılır ya hata yada değer dönüp bitirir.
 //Stream : Bir boru hattı şeklinde çalışır (pipe), zaman içinde 1 10 100 yada sonsuz sayıda veri akılı sağlanabilir.
@@ -44,4 +44,4 @@ void main(){
 }
 
 
-
+*/
