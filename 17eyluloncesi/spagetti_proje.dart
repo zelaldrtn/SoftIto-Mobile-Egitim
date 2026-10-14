@@ -155,7 +155,7 @@ class SiparisYoneticisi {
     double kdv = toplam * 0.20;
     double sonTutar = toplam + kdv;
 
-    odemeYap(odemeTipi, sonTutar);
+    odemeYap(odemeYontemi, sonTutar);
     siparisKaydet(orderId, sonTutar);
     faturaYazdir(orderId);
     mailGonder(email, "Sayin $musteriAdi, siparisiniz alindi. Tutar: $sonTutar TL");
