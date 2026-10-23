@@ -43,12 +43,11 @@ Takvim
 - Mevcut ve en uzun streak'i göster.
 - Streak, alışkanlığın planlı günlerine göre hesaplansın; plan dışı günler zinciri bozmasın.
 Odam
-- Tek, sade bir oda görünümü.
-- Puan bakiyesi, mağaza, sahip olunan eşyalar ve eşya satın alma/yerleştirme.
-- İlk sürümde sabit yerleşim veya basit yer seçimi yeterli; karmaşık sürükle-bırak zorunlu değil.
-- Satın alma sırasında puan yetmiyorsa işlemi engelle.
-- Satın alınan eşya envanterde saklansın; aynı satın alma iki kez işlenmesin.
-- Streak kilometre taşları özel dekorasyon ödülleri açabilsin.
+- Oda, Decor Life benzeri görsel açıdan zengin, mümkün olduğunca 3D görünümlü veya izometrik tasarıma sahip olmalı.
+- Mobilyalar yalnızca ikon ve yazıyla temsil edilmemeli; görsel mobilya modelleri ve dekorasyonlar kullanılmalı.
+- Kullanıcı kazandığı puanlarla mobilya satın alabilmeli ve odasını kişiselleştirebilmeli.
+- Satın alınan eşyalar ve oda düzeni cihazda yerel olarak kaydedilmeli.
+- Tasarım Flutter ile uyumlu, performanslı ve uygulanabilir olmalı. Gerçek 3D çok karmaşıksa öncelikle izometrik tasarım tercih edilmeli.
 Analiz
 - Haftalık/aylık tamamlama yüzdesi ve alışkanlık bazlı çubuk grafikler.
 - En istikrarlı alışkanlık, toplam tamamlamalar, puanlar ve streak istatistikleri.

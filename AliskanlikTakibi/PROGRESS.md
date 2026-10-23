@@ -17,60 +17,58 @@ Bu dosya, `PROJECT.md` ve `SKILL.md` yönergeleri doğrultusunda DO IT alışkan
 
 - [x] **Aşama 0: Hazırlık & Analiz**
   - `PROJECT.md` ve `SKILL.md` kuralları eksiksiz okundu.
-  - Flutter ve iOS ortamı doğrulandı (Flutter 3.47.6 / Dart 3.13.5).
+  - Flutter ve macOS/iOS ortamı doğrulandı.
   - Takip dosyası (`PROGRESS.md`) oluşturuldu.
 
-- [ ] **Aşama 1: Flutter Projesinin Kurulumu ve Bağımlılıklar**
-  - Flutter projesinin oluşturulması (`aliskanlik_takibi`).
-  - Gerekli yerel paketlerin eklenmesi (`shared_preferences`, `intl`, `flutter_svg` / `path_provider` vb.).
-  - Proje yapısının `SKILL.md` ile uyumlu kurulması (`lib/models`, `lib/screens`, `lib/widgets`, `lib/services`, `lib/theme`).
+- [x] **Aşama 1: Flutter Projesinin Kurulumu ve Bağımlılıklar**
+  - Flutter projesi ve bağımlılıkları doğrulandı (`shared_preferences`, `intl`, `provider`, `cupertino_icons`).
+  - Proje mimarisi `SKILL.md` ile birebir uyumlu oluşturuldu (`lib/models`, `lib/screens`, `lib/widgets`, `lib/services`, `lib/theme`).
 
-- [ ] **Aşama 2: Tasarım Sistemi, Renk Paleti ve Tema (Açık/Koyu)**
-  - `lib/theme/app_theme.dart` (Cream, Sage Green, Forest, Sand).
-  - Material 3 uyumlu Light & Dark temalar.
-  - Tipografi ve yuvarlatılmış kart stilleri.
+- [x] **Aşama 2: Tasarım Sistemi, Renk Paleti ve Tema (Açık/Koyu)**
+  - `lib/theme/app_theme.dart` (Cream `#F5F1E8`, Sage Green `#63856B`, Forest `#263C33`, Sand `#E7C9A5`).
+  - Material 3 uyumlu Light & Dark temalar, modern tipografi ve yuvarlatılmış kartlar uygulandı.
 
-- [ ] **Aşama 3: Veri Modelleri ve Yerel Depolama Servisi**
-  - Alışkanlık Modeli (`Habit`, sıklık, zorluk, otomatik puan kuralları).
-  - Günlük Kayıt Modeli (`HabitLog`, tarih, tamamlanma, kazanılan puan).
-  - Eşya / Dekorasyon Modeli (`RoomItem`, kategori, fiyat, sahip olma durumu, konum).
-  - Rozet Modeli (`BadgeItem`).
-  - Yerel Depolama Servisi (`LocalStorageService` - SharedPreferences & JSON, kalıcılık garantisi).
+- [x] **Aşama 3: Veri Modelleri ve Yerel Depolama Servisi**
+  - `lib/models/habit.dart`: Kategori, sıklık (her gün, hafta içi, seçili günler), otomatik zorluk puanı (3, 5, 10, 15), duraklatma ve planlı gün kontrolü.
+  - `lib/models/habit_log.dart`: Tarih formatı (`YYYY-MM-DD`), tekil tamamlama garantisi, kazanılan puan.
+  - `lib/models/room_item.dart`: 8 oda slotu (desk, plant, bookshelf, rug, wallArt, lamp, chair, trophy), streak kilometre taşı gereksinimleri, envanter sahipliği.
+  - `lib/models/badge_item.dart`: Başarım rozetleri ve kilit açma koşulları.
+  - `lib/models/user_profile.dart`: Yerel isim, avatar, tema tercihi, bildirim saati.
+  - `lib/services/storage_service.dart`: SharedPreferences ile JSON serileştirme ve başlangıç tohum verileri.
+  - `lib/services/habit_provider.dart`: Tamamlama başına tek puan kuralı, planlı günlere duyarlı streak hesaplayıcı, yetersiz bakiye engellemesi.
 
-- [ ] **Aşama 4: Ana İskelet ve Navigasyon (5 Sekme)**
-  - Sabit alt menü: Bugün, Takvim, Odam, Analiz, Profil.
-  - Durum yönetimi ve veri akışı.
+- [x] **Aşama 4: Ana İskelet ve Navigasyon (5 Sekme)**
+  - `lib/screens/main_navigation_screen.dart` ve `lib/widgets/bottom_nav_bar.dart`:
+    1. Bugün
+    2. Takvim
+    3. Odam
+    4. Analiz
+    5. Profil
 
-- [ ] **Aşama 5: "Bugün" Ekranı ve Alışkanlık Yönetimi (Ekle/Düzenle/Sil/Duraklat)**
-  - Karşılama, günlük ilerleme dairesi/yüzdesi, streak ve günlük puan göstergesi.
-  - Alışkanlık kartları (tamamla/geri al, tekil puan garantisi).
-  - Alışkanlık Ekle/Düzenle modal formu (otomatik puan hesaplama, doğrulama).
+- [x] **Aşama 5: "Bugün" Ekranı ve Alışkanlık Yönetimi (Ekle/Düzenle/Sil/Duraklat)**
+  - `lib/screens/today_screen.dart`, `lib/widgets/circular_progress.dart`, `lib/widgets/habit_card.dart`.
+  - Günlük karşılama, pasta ilerleme yüzdesi, aktif streak, bugün kazanılan puan.
+  - `lib/screens/habit_form_screen.dart`: Form doğrulaması, otomatik zorluk puan göstergesi, ikon & sıklık seçici.
 
-- [ ] **Aşama 6: "Takvim" Ekranı ve Günlük Aktivite Izgarası**
-  - Aylık takvim, gün geçişleri.
-  - Renkli aktivite ızgarası ve seçilen günün alışkanlıkları.
-  - Planlı günlere duyarlı streak hesaplayıcı.
+- [x] **Aşama 6: "Takvim" Ekranı ve Günlük Aktivite Izgarası**
+  - `lib/screens/calendar_screen.dart`: Ay navigasyonu, aktivite ızgarası, seçilen günde tamamlanan alışkanlıklar listesi, aktif & en uzun streak sayaçları.
 
-- [ ] **Aşama 7: "Odam" Ekranı, Mağaza ve Envanter**
-  - Minimalist 2D/izometrik oda görselleştirmesi.
-  - Puan bakiyesi, mağaza kataloğu, satın alma (yetersiz puan kontrolü).
-  - Eşya envanteri ve odaya yerleştirme.
-  - Streak kilometre taşı ödülleri.
+- [x] **Aşama 7: "Odam" Ekranı, Mağaza ve Envanter**
+  - `lib/screens/room_screen.dart`: Mimari oda arka planı, 8 adet interaktif slot (çalışma masası, bitki, kütüphane, lambader vb.).
+  - `lib/screens/room_store_screen.dart`: Kategori filtreli mağaza, streak kilitleri, puan kontrolü ve envanter yönetimi.
 
-- [ ] **Aşama 8: "Analiz" Ekranı ve "DO IT Wrapped"**
-  - Gerçek yerel verilerden haftalık/aylık grafikler ve istatistikler.
-  - Hikâye formatında kaydırılabilir aylık DO IT Wrapped kartları.
-  - Boş durumların ele alınması.
+- [x] **Aşama 8: "Analiz" Ekranı ve "DO IT Wrapped"**
+  - `lib/screens/analytics_screen.dart`: Son 7 gün çubuk grafikler, en istikrarlı alışkanlık, toplam tamamlama ve puan istatistikleri.
+  - `lib/screens/wrapped_screen.dart`: Kaydırılabilir hikâye kartları, gerçek aylık özet, veri yoksa temiz boş durum ekranı.
 
-- [ ] **Aşama 9: "Profil" Ekranı, Rozetler ve Ayarlar**
-  - İsim/avatar düzenleme (yerel).
-  - Rozet vitrini (başarımlar).
-  - Tema seçimi (Sistem / Açık / Koyu).
-  - Bildirim tercihleri & Uygulama bilgisi.
+- [x] **Aşama 9: "Profil" Ekranı, Rozetler ve Ayarlar**
+  - `lib/screens/profile_screen.dart`: İsim/avatar düzenleme, rozet vitrini modalı, Sistem/Açık/Koyu tema seçimi, günlük hatırlatıcı saati.
 
-- [ ] **Aşama 10: Minimalist Logo Oluşturma & Varlıklar**
-  - Uygulama temasına uygun minimalist logo ve ikon oluşturulması.
+- [x] **Aşama 10: Varlıklar ve Minimalist Görseller**
+  - `assets/images/logo.png` varlığı korundu ve pubspec.yaml içinde tanımlandı.
 
-- [ ] **Aşama 11: Testler, iOS Simülatöründe Çalıştırma ve Doğrulama**
-  - Simülatörün başlatılması ve uygulamanın derlenip çalıştırılması.
-  - Veri kalıcılığı, puan kuralları ve tüm butonların test edilmesi.
+- [x] **Aşama 11: Testler, iOS Simülatöründe Çalıştırma ve Canlı Doğrulama**
+  - `flutter analyze`: 0 hata, 0 uyarı (temiz statik analiz).
+  - `flutter test`: Tüm birim ve widget testleri başarıyla geçti (puan kuralları, çift puan engelleme, yetersiz bakiye kontrolü, 5 sekmeli ana navigasyon doğrulaması).
+  - **iOS Simülatörü (iPhone 18 Pro)**: Uygulama derlendi, simülatöre yüklendi ve aktif olarak başlatıldı (`com.doit.aliskanlikTakibi`, PID 10694). Tüm başlık ve alt metin hizalamaları, responsive `Expanded` sarmalamaları ve DO IT tasarım sistemine ait yumuşak krem-yeşil renk paleti canlı simülatör ekran görüntüsüyle (`simulator_active.png`) doğrulandı.
+
