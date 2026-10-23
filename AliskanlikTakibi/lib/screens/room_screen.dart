@@ -4,6 +4,7 @@ import '../services/habit_provider.dart';
 import '../models/room_item.dart';
 import '../theme/app_theme.dart';
 import '../widgets/isometric_room_view.dart';
+import '../widgets/real_3d_room_view.dart';
 import 'room_store_screen.dart';
 
 class RoomScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _RoomScreenState extends State<RoomScreen> {
   RoomSlotType? _selectedSlot;
   bool _showLabels = false;
   bool _isNightMode = false;
+  bool _is3DMode = true;
 
   @override
   void didChangeDependencies() {
@@ -166,7 +168,41 @@ class _RoomScreenState extends State<RoomScreen> {
             ),
             const SizedBox(height: 4),
 
-            // 3D Isometric Decor Life Room Canvas
+            // View Mode Selector: 3D Gerçek Oda / 2D İzometrik
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+              child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<bool>(
+                  segments: const [
+                    ButtonSegment<bool>(
+                      value: true,
+                      icon: Icon(Icons.view_in_ar_rounded, size: 16),
+                      label: Text('3D Gerçek Oda', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    ),
+                    ButtonSegment<bool>(
+                      value: false,
+                      icon: Icon(Icons.grid_view_rounded, size: 16),
+                      label: Text('2D İzometrik', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                    ),
+                  ],
+                  selected: {_is3DMode},
+                  onSelectionChanged: (set) => setState(() => _is3DMode = set.first),
+                  style: ButtonStyle(
+                    visualDensity: VisualDensity.compact,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    side: WidgetStatePropertyAll(
+                      BorderSide(
+                        color: isDark ? AppColors.darkBorder : AppColors.borderLight,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 4),
+
+            // 3D Decor Life Room Canvas
             Expanded(
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
@@ -187,14 +223,23 @@ class _RoomScreenState extends State<RoomScreen> {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
-                  child: IsometricRoomView(
-                    roomItems: provider.roomItems,
-                    isDark: isDark,
-                    isNightMode: _isNightMode,
-                    showLabels: _showLabels,
-                    selectedSlot: _selectedSlot,
-                    onSlotSelected: (slot) => _onSlotSelected(context, provider, slot),
-                  ),
+                  child: _is3DMode
+                      ? Real3DRoomView(
+                          roomItems: provider.roomItems,
+                          isDark: isDark,
+                          isNightMode: _isNightMode,
+                          selectedSlot: _selectedSlot,
+                          onSlotSelected: (slot) => _onSlotSelected(context, provider, slot),
+                          onToggleNightMode: () => setState(() => _isNightMode = !_isNightMode),
+                        )
+                      : IsometricRoomView(
+                          roomItems: provider.roomItems,
+                          isDark: isDark,
+                          isNightMode: _isNightMode,
+                          showLabels: _showLabels,
+                          selectedSlot: _selectedSlot,
+                          onSlotSelected: (slot) => _onSlotSelected(context, provider, slot),
+                        ),
                 ),
               ),
             ),
@@ -202,13 +247,13 @@ class _RoomScreenState extends State<RoomScreen> {
             // Interactive Bottom Slot Info Card or Motivation Footer
             AnimatedCrossFade(
               duration: const Duration(milliseconds: 250),
-              crossFadeState: _selectedSlot != null
+              crossFadeState: (!_is3DMode && _selectedSlot != null)
                   ? CrossFadeState.showSecond
                   : CrossFadeState.showFirst,
               firstChild: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                padding: const EdgeInsets.fromLTRB(16, 6, 16, 10),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.darkSurface : Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -218,11 +263,17 @@ class _RoomScreenState extends State<RoomScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.lightbulb_rounded, color: AppColors.sageGreen, size: 20),
+                      Icon(
+                        _is3DMode ? Icons.view_in_ar_rounded : Icons.lightbulb_rounded,
+                        color: AppColors.sageGreen,
+                        size: 20,
+                      ),
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          'Her tamamlanan alışkanlık puan kazandırır, odan senin istikrarınla güzelleşir.',
+                          _is3DMode
+                              ? 'Gerçek 3D Oda: Zemin, duvarlar ve kamera hazır. Odayı serbestçe döndürüp inceleyebilirsiniz.'
+                              : 'Her tamamlanan alışkanlık puan kazandırır, odan senin istikrarınla güzelleşir.',
                           style: TextStyle(
                             fontSize: 12,
                             color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
