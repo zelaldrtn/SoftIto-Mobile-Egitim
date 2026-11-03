@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';  //Flutterin material design bileşenlerini getirir.
-import '../moels/urun.dart'; //kendi oluşturduğumuz ürün dart dosyasını içeri aktarıyoruz.
+import '../models/urun.dart'; //kendi oluşturduğumuz ürün dart dosyasını içeri aktarıyoruz.
 
 class UrunKarti extends StatelessWidget{
     final Urun urun; //
