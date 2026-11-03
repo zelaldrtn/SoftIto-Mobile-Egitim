@@ -256,6 +256,33 @@ class HabitProvider extends ChangeNotifier {
 
   // --- ROOM STORE & INVENTORY ---
 
+  static ({double x, double z, double rot}) getDefaultSlotCoordinates(RoomSlotType slot) {
+    switch (slot) {
+      case RoomSlotType.desk:
+        return (x: -1.6, z: 1.8, rot: 0.0);
+      case RoomSlotType.chair:
+        return (x: -1.6, z: 0.6, rot: 0.0);
+      case RoomSlotType.sofa:
+        return (x: 1.6, z: -1.2, rot: -45.0);
+      case RoomSlotType.bed:
+        return (x: 1.8, z: 1.6, rot: 0.0);
+      case RoomSlotType.wardrobe:
+        return (x: 2.4, z: -0.4, rot: -90.0);
+      case RoomSlotType.bookshelf:
+        return (x: -2.8, z: -1.2, rot: 90.0);
+      case RoomSlotType.rug:
+        return (x: 0.0, z: -0.4, rot: 0.0);
+      case RoomSlotType.plant:
+        return (x: 2.4, z: 2.4, rot: 0.0);
+      case RoomSlotType.lamp:
+        return (x: -2.6, z: 2.4, rot: 0.0);
+      case RoomSlotType.wallArt:
+        return (x: -3.8, z: 0.0, rot: 90.0);
+      case RoomSlotType.trophy:
+        return (x: 0.8, z: 2.6, rot: 0.0);
+    }
+  }
+
   bool buyRoomItem(String itemId) {
     final index = _roomItems.indexWhere((item) => item.id == itemId);
     if (index == -1) return false;
@@ -278,14 +305,36 @@ class HabitProvider extends ChangeNotifier {
     }
 
     _pointsBalance -= item.price;
-    _roomItems[index] = item.copyWith(isOwned: true, isPlaced: true);
 
-    // If placed, unplace any other item of the same slot type
+    // Aynı slot tipindeki önceki yerleştirilmiş eşyanın koordinatlarını devral
+    double targetX = item.positionX;
+    double targetZ = item.positionZ;
+    double targetRot = item.rotationY;
+
     for (int i = 0; i < _roomItems.length; i++) {
       if (i != index && _roomItems[i].slotType == item.slotType && _roomItems[i].isPlaced) {
+        targetX = _roomItems[i].positionX;
+        targetZ = _roomItems[i].positionZ;
+        targetRot = _roomItems[i].rotationY;
         _roomItems[i] = _roomItems[i].copyWith(isPlaced: false);
       }
     }
+
+    // Eğer koordinatlar 0,0 ise slot için doğal 3D başlangıç koordinatını ata
+    if (targetX == 0.0 && targetZ == 0.0) {
+      final defCoord = getDefaultSlotCoordinates(item.slotType);
+      targetX = defCoord.x;
+      targetZ = defCoord.z;
+      targetRot = defCoord.rot;
+    }
+
+    _roomItems[index] = item.copyWith(
+      isOwned: true,
+      isPlaced: true,
+      positionX: targetX,
+      positionZ: targetZ,
+      rotationY: targetRot,
+    );
 
     _storageService.savePoints(_pointsBalance);
     _storageService.saveRoomItems(_roomItems);
@@ -302,18 +351,124 @@ class HabitProvider extends ChangeNotifier {
     if (!item.isOwned) return;
 
     final willPlace = !item.isPlaced;
+    double targetX = item.positionX;
+    double targetZ = item.positionZ;
+    double targetRot = item.rotationY;
 
     if (willPlace) {
-      // Unplace other item in the same slot
+      // Unplace other item in the same slot & devral
       for (int i = 0; i < _roomItems.length; i++) {
         if (_roomItems[i].slotType == item.slotType && _roomItems[i].isPlaced) {
+          if (targetX == 0.0 && targetZ == 0.0) {
+            targetX = _roomItems[i].positionX;
+            targetZ = _roomItems[i].positionZ;
+            targetRot = _roomItems[i].rotationY;
+          }
           _roomItems[i] = _roomItems[i].copyWith(isPlaced: false);
         }
       }
+
+      if (targetX == 0.0 && targetZ == 0.0) {
+        final defCoord = getDefaultSlotCoordinates(item.slotType);
+        targetX = defCoord.x;
+        targetZ = defCoord.z;
+        targetRot = defCoord.rot;
+      }
     }
 
-    _roomItems[index] = item.copyWith(isPlaced: willPlace);
+    _roomItems[index] = item.copyWith(
+      isPlaced: willPlace,
+      positionX: targetX,
+      positionZ: targetZ,
+      rotationY: targetRot,
+    );
     _storageService.saveRoomItems(_roomItems);
+    notifyListeners();
+  }
+
+  void addPoints(int amount) {
+    _pointsBalance += amount;
+    _storageService.savePoints(_pointsBalance);
+    notifyListeners();
+  }
+
+  void updateRoomItemPosition(String itemId, double x, double z, {double? rotationY}) {
+    final index = _roomItems.indexWhere((item) => item.id == itemId);
+    if (index == -1) return;
+
+    // Sınırları sabitle (-3.2 ile 3.2 arası zemin sınırları)
+    final clampedX = x.clamp(-3.2, 3.2);
+    final clampedZ = z.clamp(-3.2, 3.2);
+
+    _roomItems[index] = _roomItems[index].copyWith(
+      positionX: clampedX,
+      positionZ: clampedZ,
+      rotationY: rotationY ?? _roomItems[index].rotationY,
+    );
+    _storageService.saveRoomItems(_roomItems);
+    notifyListeners();
+  }
+
+  void rotateRoomItem(String itemId) {
+    final index = _roomItems.indexWhere((item) => item.id == itemId);
+    if (index == -1) return;
+
+    final currentRot = _roomItems[index].rotationY;
+    final nextRot = (currentRot + 90.0) % 360.0;
+
+    _roomItems[index] = _roomItems[index].copyWith(rotationY: nextRot);
+    _storageService.saveRoomItems(_roomItems);
+    notifyListeners();
+  }
+
+  void setItemPlacement(String itemId, bool isPlaced, {double? x, double? z}) {
+    final index = _roomItems.indexWhere((item) => item.id == itemId);
+    if (index == -1) return;
+
+    final item = _roomItems[index];
+    if (!item.isOwned) return;
+
+    double posX = x ?? item.positionX;
+    double posZ = z ?? item.positionZ;
+    double posRot = item.rotationY;
+
+    if (isPlaced) {
+      // Unplace other item in the same slot
+      for (int i = 0; i < _roomItems.length; i++) {
+        if (i != index && _roomItems[i].slotType == item.slotType && _roomItems[i].isPlaced) {
+          if (posX == 0.0 && posZ == 0.0) {
+            posX = _roomItems[i].positionX;
+            posZ = _roomItems[i].positionZ;
+            posRot = _roomItems[i].rotationY;
+          }
+          _roomItems[i] = _roomItems[i].copyWith(isPlaced: false);
+        }
+      }
+
+      if (posX == 0.0 && posZ == 0.0) {
+        final defCoord = getDefaultSlotCoordinates(item.slotType);
+        posX = defCoord.x;
+        posZ = defCoord.z;
+        posRot = defCoord.rot;
+      }
+    }
+
+    _roomItems[index] = item.copyWith(
+      isPlaced: isPlaced,
+      positionX: posX,
+      positionZ: posZ,
+      rotationY: posRot,
+    );
+    _storageService.saveRoomItems(_roomItems);
+    notifyListeners();
+  }
+
+  Future<void> setThemeMode(dynamic mode) async {
+    final String modeStr = mode is ThemeMode
+        ? (mode == ThemeMode.light ? 'light' : mode == ThemeMode.dark ? 'dark' : 'system')
+        : mode.toString();
+    _profile = _profile.copyWith(themeMode: modeStr);
+    await _storageService.saveProfile(_profile);
     notifyListeners();
   }
 

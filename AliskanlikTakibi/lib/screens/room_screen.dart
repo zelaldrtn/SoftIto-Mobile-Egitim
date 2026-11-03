@@ -4,7 +4,7 @@ import '../services/habit_provider.dart';
 import '../models/room_item.dart';
 import '../theme/app_theme.dart';
 import '../widgets/isometric_room_view.dart';
-import '../widgets/real_3d_room_view.dart';
+import '../widgets/game3d/room_game_view.dart';
 import 'room_store_screen.dart';
 
 class RoomScreen extends StatefulWidget {
@@ -19,13 +19,17 @@ class _RoomScreenState extends State<RoomScreen> {
   bool _showLabels = false;
   bool _isNightMode = false;
   bool _is3DMode = true;
+  bool _didInitNightMode = false;
+  String? _initialSelectedItemId;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Default night ambiance to match dark mode initially
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    _isNightMode = isDark;
+    if (!_didInitNightMode) {
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      _isNightMode = isDark;
+      _didInitNightMode = true;
+    }
   }
 
   @override
@@ -48,10 +52,17 @@ class _RoomScreenState extends State<RoomScreen> {
           IconButton(
             icon: const Icon(Icons.storefront_rounded),
             tooltip: 'Mağaza',
-            onPressed: () {
-              Navigator.of(context).push(
+            onPressed: () async {
+              final boughtItemId = await Navigator.of(context).push<String>(
                 MaterialPageRoute(builder: (_) => const RoomStoreScreen()),
               );
+              if (boughtItemId != null && mounted) {
+                setState(() {
+                  _is3DMode = true;
+                  _selectedSlot = null;
+                  _initialSelectedItemId = boughtItemId;
+                });
+              }
             },
           ),
         ],
@@ -168,7 +179,7 @@ class _RoomScreenState extends State<RoomScreen> {
             ),
             const SizedBox(height: 4),
 
-            // View Mode Selector: 3D Gerçek Oda / 2D İzometrik
+            // View Mode Selector: 3D Dekorasyon Oyunu / 2D İzometrik
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
               child: SizedBox(
@@ -178,7 +189,7 @@ class _RoomScreenState extends State<RoomScreen> {
                     ButtonSegment<bool>(
                       value: true,
                       icon: Icon(Icons.view_in_ar_rounded, size: 16),
-                      label: Text('3D Gerçek Oda', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                      label: Text('3D Oda Oyunu', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                     ButtonSegment<bool>(
                       value: false,
@@ -224,12 +235,10 @@ class _RoomScreenState extends State<RoomScreen> {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(24),
                   child: _is3DMode
-                      ? Real3DRoomView(
-                          roomItems: provider.roomItems,
+                      ? Room3DGameView(
                           isDark: isDark,
                           isNightMode: _isNightMode,
-                          selectedSlot: _selectedSlot,
-                          onSlotSelected: (slot) => _onSlotSelected(context, provider, slot),
+                          initialSelectedItemId: _initialSelectedItemId,
                           onToggleNightMode: () => setState(() => _isNightMode = !_isNightMode),
                         )
                       : IsometricRoomView(
@@ -272,7 +281,7 @@ class _RoomScreenState extends State<RoomScreen> {
                       Expanded(
                         child: Text(
                           _is3DMode
-                              ? 'Gerçek 3D Oda: Zemin, duvarlar ve kamera hazır. Odayı serbestçe döndürüp inceleyebilirsiniz.'
+                              ? 'Gerçek 3D Dekorasyon Oyunu: Mobilyaları tutup zeminde sürükleyin, döndürün ve odanızı serbestçe dekore edin.'
                               : 'Her tamamlanan alışkanlık puan kazandırır, odan senin istikrarınla güzelleşir.',
                           style: TextStyle(
                             fontSize: 12,

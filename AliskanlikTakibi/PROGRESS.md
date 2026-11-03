@@ -72,3 +72,28 @@ Bu dosya, `PROJECT.md` ve `SKILL.md` yönergeleri doğrultusunda DO IT alışkan
   - `flutter test`: Tüm birim ve widget testleri başarıyla geçti (puan kuralları, çift puan engelleme, yetersiz bakiye kontrolü, 5 sekmeli ana navigasyon doğrulaması).
   - **iOS Simülatörü (iPhone 18 Pro)**: Uygulama derlendi, simülatöre yüklendi ve aktif olarak başlatıldı (`com.doit.aliskanlikTakibi`, PID 10694). Tüm başlık ve alt metin hizalamaları, responsive `Expanded` sarmalamaları ve DO IT tasarım sistemine ait yumuşak krem-yeşil renk paleti canlı simülatör ekran görüntüsüyle (`simulator_active.png`) doğrulandı.
 
+- [x] **Aşama 12: Gerçek 3D Dekorasyon Oyunu Motoru (Floor Raycasting, Sürükle-Bırak & Z-Sorting)**
+  - `ditredi` kütüphanesindeki Z-fighting, zemin kararması ve raycast eksikliği kökten çözüldü; bozuk software rasterizer tamamen projeden kaldırıldı.
+  - Saf Flutter ve `vector_math` tabanlı yüksek performanslı **Custom 3D Game Engine** (`lib/widgets/game3d/`) inşa edildi:
+    - `math3d.dart`: Spherical Camera3D, View-Projection matrisleri, Screen-to-World Floor Raycasting (dokunulan pikselin Y=0 zemin düzlemiyle kesişim hesabı).
+    - `mesh3d.dart`: 3D Poligon, Backface Culling, Lambertian Diffuse + Ambient Shading, 6 yüzeyli kutu üretici.
+    - `furniture_models_3d.dart`: Masa, sandalye, koltuk, yatak, gardırop/dolap, kitaplık & raf, halı, saksı bitkisi, lambader, duvar tablosu ve başarı kupası için tam detaylı 3D geometriler.
+    - `room_scene_3d.dart`: 8x8 ahşap parke zemin karoları, segmentli duvarlar, pencere ve süpürgelikler; derinlik sıralaması (Painters algorithm) ile kusursuz kesintisiz render.
+    - `room_game_view.dart`: Dokunarak seçme, zemin üzerinde serbest parmakla sürükleme, 90° döndürme, ızgara kilidi (snap-to-grid), 360° serbest kamera modu, preset açılar ve alt mobilya envanter tepsisi.
+  - `RoomItem` modeline 3D koordinatlar (`positionX`, `positionZ`, `rotationY`) eklendi; SharedPreferences ile cihazda otomatik kaydedilip açılışta restore edilmesi sağlandı.
+- [x] **Aşama 13: 4 Kritik Sorunun Kökten Çözümü & Doğrulaması**
+  - **1. Tema Hatası Çözüldü:**
+    - *Kök Neden:* `RoomScreen` içerisindeki `didChangeDependencies()` her rebuild olduğunda `_isNightMode = isDark;` çalıştırıyordu. 3D odadaki eşya sürüklendiğinde `HabitProvider`'daki `updateRoomItemPosition` metodu `notifyListeners()` çağırıyor, bu da açık temadayken gece modunu tetikleyip uygulamayı zorla koyu temaya geçiriyordu.
+    - *Çözüm:* `_didInitNightMode` bayrağı eklendi; didChangeDependencies yalnızca ilk açılışta gece modunu ilklendiriyor. Sürükleme anında (`onPanUpdate`) yerel state değişkenleri (`_dragPosX`, `_dragPosZ`) kullanılarak gereksiz global rebuild ve tema sıçraması engellendi; sadece parmak kaldırıldığında (`onPanEnd`) tek seferde SharedPreferences'e yazılması sağlandı. Açık ve koyu tema bağımsız ve stabil hale getirildi.
+  - **2. Mağaza & 3D Oda Bağlantısı ve Çift Satın Alma Engelleme:**
+    - *Kök Neden:* Mağazadan satın alınan eşyalar yalnızca 2D odada görünüyordu; 3D koordinatlar atanmıyordu ve yerel kayıt ile yeni katalog eşyaları birleştiğinde mükerrer kayıt veya kayıp olabiliyordu.
+    - *Çözüm:* `StorageService.loadRoomItems()` içine varsayılan katalog ile yerel kaydı birleştiren akıllı tekilleştirme (`merge`) eklendi. `HabitProvider.buyRoomItem()` içinde satın alınan eşyaya slotun 3D koordinatları (`positionX`, `positionZ`, `rotationY`) otomatik olarak atandı ve 3D odada anında görünür hale getirildi. Zaten sahip olunan bir eşyanın tekrar satın alınması (`isOwned` kontrolü) kesin olarak engellendi.
+  - **3. Render & Gömülme Hatalarının Giderilmesi:**
+    - *Kök Neden:* Painter's algorithm tek bir havuzda tüm poligonları sıralarken, geniş zemin karoları ve duvarlar mobilyaların merkez noktasından daha yakın algılanıp mobilyaların üstüne çiziliyor, eşyaların zemine gömülmüş veya yarım kesilmiş görünmesine yol açıyordu.
+    - *Çözüm:* **Katmanlı Derinlik Mimarisi (Layered Depth Pipeline)** uygulandı: Zemin Karoları -> Duvarlar & Pencere -> Zemin Halıları -> Mobilyalar & Eşyalar -> Seçim Halkası & Yardımcı Çizgiler. Bu sayede zemin mobilyaların üzerine asla çizilemez; `math3d.dart` içine `clampNear: true` eklenerek kameraya yaklaşınca poligonların kaybolması engellendi.
+  - **4. Veri Tutarlılığı ve SharedPreferences Senkronizasyonu:**
+    - Satın alınan eşyalar, harcanan puanlar, mobilya 3D koordinatları (`positionX`, `positionZ`) ve 90 derecelik rotasyonlar (`rotationY`) yerel depolama ile tam uyumlu hale getirildi. Uygulama tamamen kapatılıp yeniden açıldığında tüm oda düzeni, eşyalar ve puanlar eksiksiz korunmaktadır.
+  - **Test Sonuçları:**
+    - `flutter analyze`: 0 hata, 0 uyarı (temiz analiz).
+    - `flutter test`: 16 testin 16'sı da (%100) başarıyla geçti (`test/real_3d_room_test.dart`, `test/math_debug_test.dart`, `test/widget_test.dart`).
+

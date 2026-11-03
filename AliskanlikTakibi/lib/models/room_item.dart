@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 
 enum RoomSlotType {
   desk('Çalışma Masası', Icons.desk_rounded),
-  plant('Bitki Köşesi', Icons.eco_rounded),
+  chair('Sandalye', Icons.chair_alt_rounded),
+  sofa('Koltuk & Dinlenme', Icons.chair_rounded),
+  bed('Yatak', Icons.bed_rounded),
+  wardrobe('Gardırop & Dolap', Icons.door_sliding_rounded),
   bookshelf('Kitaplık & Raf', Icons.shelves),
   rug('Zemin & Halı', Icons.crop_landscape_rounded),
-  wallArt('Duvar Dekoru', Icons.brush_rounded),
+  plant('Bitki Köşesi', Icons.eco_rounded),
   lamp('Aydınlatma', Icons.lightbulb_outline_rounded),
-  chair('Oturma Alanı', Icons.chair_rounded),
+  wallArt('Duvar Dekoru', Icons.brush_rounded),
   trophy('Başarı Alanı', Icons.emoji_events_rounded);
 
   final String label;
@@ -25,6 +28,9 @@ class RoomItem {
   final int streakRequirement; // 0 for regular store item; >0 for milestone unlock
   final bool isOwned;
   final bool isPlaced;
+  final double positionX; // 3D world X on floor (-3.2 .. 3.2)
+  final double positionZ; // 3D world Z on floor (-3.2 .. 3.2)
+  final double rotationY; // Degrees: 0, 90, 180, 270
 
   const RoomItem({
     required this.id,
@@ -36,6 +42,9 @@ class RoomItem {
     this.streakRequirement = 0,
     this.isOwned = false,
     this.isPlaced = false,
+    this.positionX = 0.0,
+    this.positionZ = 0.0,
+    this.rotationY = 0.0,
   });
 
   RoomItem copyWith({
@@ -48,6 +57,9 @@ class RoomItem {
     int? streakRequirement,
     bool? isOwned,
     bool? isPlaced,
+    double? positionX,
+    double? positionZ,
+    double? rotationY,
   }) {
     return RoomItem(
       id: id ?? this.id,
@@ -59,6 +71,9 @@ class RoomItem {
       streakRequirement: streakRequirement ?? this.streakRequirement,
       isOwned: isOwned ?? this.isOwned,
       isPlaced: isPlaced ?? this.isPlaced,
+      positionX: positionX ?? this.positionX,
+      positionZ: positionZ ?? this.positionZ,
+      rotationY: rotationY ?? this.rotationY,
     );
   }
 
@@ -73,6 +88,9 @@ class RoomItem {
       'streakRequirement': streakRequirement,
       'isOwned': isOwned,
       'isPlaced': isPlaced,
+      'positionX': positionX,
+      'positionZ': positionZ,
+      'rotationY': rotationY,
     };
   }
 
@@ -92,6 +110,9 @@ class RoomItem {
       streakRequirement: (map['streakRequirement'] as int?) ?? 0,
       isOwned: (map['isOwned'] as bool?) ?? false,
       isPlaced: (map['isPlaced'] as bool?) ?? false,
+      positionX: (map['positionX'] as num?)?.toDouble() ?? 0.0,
+      positionZ: (map['positionZ'] as num?)?.toDouble() ?? 0.0,
+      rotationY: (map['rotationY'] as num?)?.toDouble() ?? 0.0,
     );
   }
 }

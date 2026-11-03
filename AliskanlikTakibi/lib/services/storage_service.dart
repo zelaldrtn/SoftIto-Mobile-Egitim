@@ -64,15 +64,50 @@ class StorageService {
     await _prefs.setString(_keyLogs, jsonStr);
   }
 
-  // Room Items
+  // Room Items (Katalog ile yerel kaydı akıllıca birleştirir, çift kayıtları engeller)
   List<RoomItem> loadRoomItems() {
+    final catalog = defaultRoomItems();
     final jsonStr = _prefs.getString(_keyRoomItems);
-    if (jsonStr == null || jsonStr.isEmpty) return defaultRoomItems();
+    if (jsonStr == null || jsonStr.isEmpty) return catalog;
+
     try {
       final List<dynamic> list = jsonDecode(jsonStr);
-      return list.map((e) => RoomItem.fromMap(e as Map<String, dynamic>)).toList();
+      final savedItems = list.map((e) => RoomItem.fromMap(e as Map<String, dynamic>)).toList();
+
+      final Map<String, RoomItem> itemMap = {};
+      // 1. Önce katalogdaki tüm eşyaları varsayılan koordinatlarıyla ekle
+      for (final catItem in catalog) {
+        itemMap[catItem.id] = catItem;
+      }
+
+      // 2. Kullanıcının yerel kaydındaki sahiplik, yerleşim ve koordinatları üzerine yaz
+      for (final saved in savedItems) {
+        if (itemMap.containsKey(saved.id)) {
+          final cat = itemMap[saved.id]!;
+          // Eğer kaydedilen koordinat 0,0 ise ve katalogda özel bir konum tanımlıysa onu koru
+          final posX = (saved.positionX == 0.0 && saved.positionZ == 0.0 && (cat.positionX != 0.0 || cat.positionZ != 0.0))
+              ? cat.positionX
+              : saved.positionX;
+          final posZ = (saved.positionX == 0.0 && saved.positionZ == 0.0 && (cat.positionX != 0.0 || cat.positionZ != 0.0))
+              ? cat.positionZ
+              : saved.positionZ;
+
+          itemMap[saved.id] = cat.copyWith(
+            isOwned: saved.isOwned,
+            isPlaced: saved.isPlaced,
+            positionX: posX,
+            positionZ: posZ,
+            rotationY: saved.rotationY,
+          );
+        } else {
+          // Özel veya gelecekteki bir eşya ise listeye ekle
+          itemMap[saved.id] = saved;
+        }
+      }
+
+      return itemMap.values.toList();
     } catch (_) {
-      return defaultRoomItems();
+      return catalog;
     }
   }
 
@@ -165,56 +200,120 @@ class StorageService {
 
   static List<RoomItem> defaultRoomItems() {
     return [
-      // Masa & Çalışma
+      // 1. Masa & Çalışma
       RoomItem(
         id: 'desk_basic',
-        name: 'Sade Ahşap Masa',
-        description: 'Sıcak tonlarda ferah bir çalışma masası.',
+        name: 'Sade Ahşap Çalışma Masası',
+        description: 'Sıcak ahşap tabla, sağlam metal ayaklar ve laptop.',
         slotType: RoomSlotType.desk,
         iconCodePoint: Icons.desk_rounded.codePoint,
         price: 30,
         isOwned: true,
         isPlaced: true,
+        positionX: -1.6,
+        positionZ: 1.8,
+        rotationY: 0,
       ),
       RoomItem(
         id: 'desk_executive',
-        name: 'Modern Meşe Çalışma İstasyonu',
-        description: 'Geniş yüzeyiyle derin odaklanma sağlar.',
+        name: 'Geniş Yönetici Masası',
+        description: 'Koyu meşe kaplama, geniş çalışma alanı.',
         slotType: RoomSlotType.desk,
         iconCodePoint: Icons.table_restaurant_rounded.codePoint,
         price: 80,
+        positionX: -1.6,
+        positionZ: 1.8,
+        rotationY: 0,
       ),
 
-      // Bitki
+      // 2. Sandalye
       RoomItem(
-        id: 'plant_succulent',
-        name: 'Sukulent Saksısı',
-        description: 'Küçük ama yeşil bir canlılık esintisi.',
-        slotType: RoomSlotType.plant,
-        iconCodePoint: Icons.eco_rounded.codePoint,
-        price: 20,
+        id: 'chair_ergonomic',
+        name: 'Ergonomik Çalışma Sandalyesi',
+        description: 'Sırt destekli ve döner tabanlı konforlu sandalye.',
+        slotType: RoomSlotType.chair,
+        iconCodePoint: Icons.chair_alt_rounded.codePoint,
+        price: 35,
         isOwned: true,
         isPlaced: true,
+        positionX: -1.6,
+        positionZ: 0.6,
+        rotationY: 0,
       ),
       RoomItem(
-        id: 'plant_monstera',
-        name: 'Büyük Deve Tabanı',
-        description: 'Odanın havasını tazeleyen tropikal yeşillik.',
-        slotType: RoomSlotType.plant,
-        iconCodePoint: Icons.yard_rounded.codePoint,
+        id: 'chair_wooden',
+        name: 'İskandinav Ahşap Sandalye',
+        description: 'Minimalist ahşap dikişli tasarım.',
+        slotType: RoomSlotType.chair,
+        iconCodePoint: Icons.chair_rounded.codePoint,
         price: 50,
-      ),
-      RoomItem(
-        id: 'plant_bonsai_milestone',
-        name: 'Kadim Bonsai Ağacı',
-        description: '7 günlük kesintisiz disiplinin yeşil ödülü.',
-        slotType: RoomSlotType.plant,
-        iconCodePoint: Icons.park_rounded.codePoint,
-        price: 0,
-        streakRequirement: 7,
+        positionX: -1.6,
+        positionZ: 0.6,
+        rotationY: 0,
       ),
 
-      // Kitaplık
+      // 3. Koltuk & Dinlenme
+      RoomItem(
+        id: 'sofa_cozy',
+        name: 'Adaçayı Dinlenme Koltuğu',
+        description: 'Yumuşak kumaş döşeme ve ahşap ayaklı berjer.',
+        slotType: RoomSlotType.sofa,
+        iconCodePoint: Icons.weekend_rounded.codePoint,
+        price: 75,
+        positionX: 1.6,
+        positionZ: -1.2,
+        rotationY: -45,
+      ),
+      RoomItem(
+        id: 'sofa_modern',
+        name: 'Modern Geniş Kanepe',
+        description: 'İki kişilik ferah ve şık oturma ünitesi.',
+        slotType: RoomSlotType.sofa,
+        iconCodePoint: Icons.chair_rounded.codePoint,
+        price: 120,
+        positionX: 1.4,
+        positionZ: -1.4,
+        rotationY: 0,
+      ),
+
+      // 4. Yatak
+      RoomItem(
+        id: 'bed_modern',
+        name: 'Konforlu Karyola & Yatak',
+        description: 'Yumuşak adaçayı nevresimli, kabarık yastıklı yatak.',
+        slotType: RoomSlotType.bed,
+        iconCodePoint: Icons.bed_rounded.codePoint,
+        price: 95,
+        positionX: 1.8,
+        positionZ: 1.6,
+        rotationY: 0,
+      ),
+      RoomItem(
+        id: 'bed_minimal',
+        name: 'Japon Tarzı Alçak Yatak',
+        description: 'Huzurlu ve minimalist uyku köşesi.',
+        slotType: RoomSlotType.bed,
+        iconCodePoint: Icons.single_bed_rounded.codePoint,
+        price: 130,
+        positionX: 1.8,
+        positionZ: 1.6,
+        rotationY: 0,
+      ),
+
+      // 5. Gardırop & Dolap
+      RoomItem(
+        id: 'wardrobe_wood',
+        name: 'Çift Kapaklı Ahşap Dolap',
+        description: 'Geniş hacimli, modern metal kulplu gardırop.',
+        slotType: RoomSlotType.wardrobe,
+        iconCodePoint: Icons.door_sliding_rounded.codePoint,
+        price: 85,
+        positionX: 2.4,
+        positionZ: -0.4,
+        rotationY: -90,
+      ),
+
+      // 6. Kitaplık & Raf
       RoomItem(
         id: 'bookshelf_minimal',
         name: 'Minimalist Duvar Rafı',
@@ -222,17 +321,23 @@ class StorageService {
         slotType: RoomSlotType.bookshelf,
         iconCodePoint: Icons.shelves.codePoint,
         price: 45,
+        positionX: -2.8,
+        positionZ: -1.2,
+        rotationY: 90,
       ),
       RoomItem(
         id: 'bookshelf_library',
         name: 'Geniş Ahşap Kütüphane',
-        description: 'Bilgelik ve alışkanlık dolu raflar.',
+        description: 'Renkli 3D kitaplarla dolu 3 katlı kütüphane.',
         slotType: RoomSlotType.bookshelf,
         iconCodePoint: Icons.local_library_rounded.codePoint,
         price: 110,
+        positionX: -2.8,
+        positionZ: -1.5,
+        rotationY: 90,
       ),
 
-      // Halı
+      // 7. Zemin & Halı
       RoomItem(
         id: 'rug_boho',
         name: 'Adaçayı Yeşili Geometrik Halı',
@@ -242,6 +347,9 @@ class StorageService {
         price: 35,
         isOwned: true,
         isPlaced: true,
+        positionX: 0.0,
+        positionZ: -0.4,
+        rotationY: 0,
       ),
       RoomItem(
         id: 'rug_sand',
@@ -250,9 +358,63 @@ class StorageService {
         slotType: RoomSlotType.rug,
         iconCodePoint: Icons.layers_rounded.codePoint,
         price: 60,
+        positionX: 0.0,
+        positionZ: -0.4,
+        rotationY: 0,
       ),
 
-      // Duvar Dekoru
+      // 8. Bitki Köşesi
+      RoomItem(
+        id: 'plant_succulent',
+        name: 'Sukulent & Seramik Saksı',
+        description: 'Küçük ama yeşil bir canlılık esintisi.',
+        slotType: RoomSlotType.plant,
+        iconCodePoint: Icons.eco_rounded.codePoint,
+        price: 20,
+        isOwned: true,
+        isPlaced: true,
+        positionX: 2.4,
+        positionZ: 2.4,
+        rotationY: 0,
+      ),
+      RoomItem(
+        id: 'plant_monstera',
+        name: 'Büyük Deve Tabanı',
+        description: 'Odanın havasını tazeleyen tropikal yeşillik.',
+        slotType: RoomSlotType.plant,
+        iconCodePoint: Icons.yard_rounded.codePoint,
+        price: 50,
+        positionX: 2.2,
+        positionZ: 2.2,
+        rotationY: 0,
+      ),
+      RoomItem(
+        id: 'plant_bonsai_milestone',
+        name: 'Kadim Bonsai Ağacı',
+        description: '7 günlük kesintisiz disiplinin yeşil ödülü.',
+        slotType: RoomSlotType.plant,
+        iconCodePoint: Icons.park_rounded.codePoint,
+        price: 0,
+        streakRequirement: 7,
+        positionX: 2.2,
+        positionZ: 2.2,
+        rotationY: 0,
+      ),
+
+      // 9. Aydınlatma
+      RoomItem(
+        id: 'lamp_warm',
+        name: 'Sıcak Işık Lambaderi',
+        description: 'Akşam okumaları için huzurlu bir ışıltı saçan lambader.',
+        slotType: RoomSlotType.lamp,
+        iconCodePoint: Icons.lightbulb_outline_rounded.codePoint,
+        price: 50,
+        positionX: -2.6,
+        positionZ: 2.4,
+        rotationY: 0,
+      ),
+
+      // 10. Duvar Dekoru
       RoomItem(
         id: 'art_nature',
         name: 'Minimal Doğa Tablosu',
@@ -260,6 +422,9 @@ class StorageService {
         slotType: RoomSlotType.wallArt,
         iconCodePoint: Icons.landscape_rounded.codePoint,
         price: 40,
+        positionX: -3.8,
+        positionZ: 0.0,
+        rotationY: 90,
       ),
       RoomItem(
         id: 'art_clock',
@@ -268,29 +433,12 @@ class StorageService {
         slotType: RoomSlotType.wallArt,
         iconCodePoint: Icons.access_time_filled_rounded.codePoint,
         price: 55,
+        positionX: -3.8,
+        positionZ: -1.5,
+        rotationY: 90,
       ),
 
-      // Aydınlatma
-      RoomItem(
-        id: 'lamp_warm',
-        name: 'Sıcak Işık Lambaderi',
-        description: 'Akşam okumaları için huzurlu bir ışıltı.',
-        slotType: RoomSlotType.lamp,
-        iconCodePoint: Icons.lightbulb_outline_rounded.codePoint,
-        price: 50,
-      ),
-
-      // Koltuk
-      RoomItem(
-        id: 'chair_cozy',
-        name: 'Rahat Okuma Koltuğu',
-        description: 'Düşüncelere dalıp dinlenmek için ideal.',
-        slotType: RoomSlotType.chair,
-        iconCodePoint: Icons.chair_rounded.codePoint,
-        price: 90,
-      ),
-
-      // Özel Streak & Başarı Ödülleri (streakRequirement > 0)
+      // 11. Özel Streak & Başarı Ödülleri
       RoomItem(
         id: 'trophy_streak_14',
         name: '14 Gün Streak Rozet Heykeli',
@@ -299,6 +447,9 @@ class StorageService {
         iconCodePoint: Icons.military_tech_rounded.codePoint,
         price: 0,
         streakRequirement: 14,
+        positionX: 0.8,
+        positionZ: 2.6,
+        rotationY: 0,
       ),
       RoomItem(
         id: 'trophy_streak_30',
@@ -308,6 +459,9 @@ class StorageService {
         iconCodePoint: Icons.emoji_events_rounded.codePoint,
         price: 0,
         streakRequirement: 30,
+        positionX: 0.8,
+        positionZ: 2.6,
+        rotationY: 0,
       ),
     ];
   }

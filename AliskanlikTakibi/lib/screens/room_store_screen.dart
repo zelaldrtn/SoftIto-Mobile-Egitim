@@ -290,10 +290,13 @@ class _RoomStoreScreenState extends State<RoomStoreScreen> {
   void _purchaseItem(BuildContext context, HabitProvider provider, RoomItem item) {
     final success = provider.buyRoomItem(item.id);
     if (success) {
+      // Eşya satın alındığında direkt odaya dön ve eşya ID'sini ilet
+      Navigator.of(context).pop(item.id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('${item.name} başarıyla satın alındı ve odana eklendi! ✨'),
+          content: Text('${item.name} satın alındı ve odana yerleştirildi! ✨'),
           behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 3),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       );

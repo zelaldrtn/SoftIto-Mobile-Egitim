@@ -500,6 +500,15 @@ class _IsometricFurniturePainter extends CustomPainter {
       case RoomSlotType.chair:
         _paintChair(canvas, size);
         break;
+      case RoomSlotType.sofa:
+        _paintChair(canvas, size);
+        break;
+      case RoomSlotType.bed:
+        _paintDesk(canvas, size);
+        break;
+      case RoomSlotType.wardrobe:
+        _paintBookshelf(canvas, size);
+        break;
       case RoomSlotType.plant:
         _paintPlant(canvas, size);
         break;
