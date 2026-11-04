@@ -48,6 +48,16 @@ class _FirestoreYonetimEkraniState extends State<FirestoreYonetimEkrani>{
                                             prefixIcon: Icon(Icons.person),
                                         ),
                                     ),
+                                    const SizedBox(height: 8),
+                                    Expanded(
+                                        child: TextField(
+                                            controller: _projeKontrolcusu,
+                                            decoration: const InputDecoration(
+                                                labelText: "Proje Adı",
+                                                prefixIcon: Icon(Icons.work),
+                                            ),
+                                        ),
+                                    ),
                                     const SizedBox(height:8),
                                     SizedBox(
                                         width:90,
@@ -146,6 +156,59 @@ class _FirestoreYonetimEkraniState extends State<FirestoreYonetimEkrani>{
             ),
         );
     }
+    void _notGuncelleDialog(OgrenciModel ogrenci){
+        final TextEditingController _yeniNotKontrolcusu=TextEditingController(text: ogrenci.notu.toStrin());
+
+         showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text("Öğrenci Notunu Güncelle"),
+        content: TextField(
+          controller: notKontrolcusu,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            labelText: "Yeni Not",
+            prefixIcon: Icon(Icons.grade),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              notKontrolcusu.dispose();
+            },
+            child: const Text("İptal"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final yeniNot =
+                  int.tryParse(notKontrolcusu.text.trim());
+
+              if (yeniNot == null || yeniNot < 0 || yeniNot > 100) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text("0-100 arasında geçerli bir not giriniz."),
+                  ),
+                );
+                return;
+              }
+
+              _servis.notuGuncelle(
+                ogrenci.id,
+                yeniNot,
+              );
+
+              Navigator.pop(context);
+              notKontrolcusu.dispose();
+            },
+            child: const Text("Güncelle"),
+          ),
+        ],
+      );
+    },
+  );
+    }
     void _yeniOgrenciKaydet(){
         final adSoyad = _adSoyadKontrolcusu.text.trim();
         final proje = _projeKontrolcusu.text.trim();
@@ -163,3 +226,4 @@ class _FirestoreYonetimEkraniState extends State<FirestoreYonetimEkrani>{
         _notKontrolcusu.clear();
     }
 }
+
