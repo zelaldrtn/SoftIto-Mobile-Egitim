@@ -105,13 +105,38 @@ class BildirimListesiKarti extends StatelessWidget{
                                 color:Colors.grey.shade500,
                             ),
                         )
-                    ) : ListView.separated(
+                    ) 
+                    : ListView.separated(
                         shrinkWrap:true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: bildirimler.length,
                         separatorBuilder: (_, __)=> const Divider(height: 1),
                         itemBuilder: (context,index){
-                            
+                            final b = bildirimler[index];
+                            return ListTile(
+                                contentPadding: EdgeInsets.zero,
+                                leading: const CircleAvatar(
+                                    backgroundColor: Color.fromARGB(0,123,238,230),
+                                    child: Icon(Icons.mark_email_unread_outlined,
+                                    color: Color.fromARGB(0,123,25,25), size:20,),
+                                ),
+                                title: Text(
+                                    b.baslik,
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                    ),
+                                ),
+                                subtitle: Text(b.icerik),
+                                trailing: Text(
+                                    //padLeft: 2 basamaklı değilse başına 0 koyar
+                                    '${b.tarih.hour.toString().padLeft(2,'0')}:${b.tarih.minute.toString().padLeft(2, '0')}',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey.shade500,
+                                    ),
+                                ),
+                            );
                         },
                     ),
                 ],
