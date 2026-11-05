@@ -2,7 +2,7 @@ class BildirimModeli{
     final String id;
     final String baslik;
     final String icerik;
-    final DateTime tarih,
+    final DateTime tarih;
     final bool okunduMu;
 
     const BildirimModeli({
@@ -10,7 +10,7 @@ class BildirimModeli{
         required this.baslik,
         required this.icerik,
         required this.tarih,
-        this.okunfuMu = false,
+        this.okunduMu = false,
     });
 
     BildirimModeli copyWith({
@@ -18,7 +18,7 @@ class BildirimModeli{
         String? baslik,
         String? icerik,
         DateTime? tarih,
-        bool? okunduMy,
+        bool? okunduMu,
     }){
         return BildirimModeli(
             id: id ?? this.id, 

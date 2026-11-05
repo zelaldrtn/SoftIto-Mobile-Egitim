@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import '../models/bildirim.dart';
+import '../models/bildirim_modeli.dart';
 
 class BildirimListesiKarti extends StatelessWidget{
     final List<BildirimModeli> bildirimler;
     final String? token;
-    final bool konyaAboneMi;
+    final bool konuyaAboneMi;
     final ValueChanged<bool> onAboneDegisti;
 
     const BildirimListesiKarti({
@@ -23,7 +23,7 @@ class BildirimListesiKarti extends StatelessWidget{
                 borderRadius: BorderRadius.circular(16),
                 side: BorderSide(color: Colors.grey.shade300),
             ),
-            child: Padding(padding: constEdgeInsets.all(16),
+            child: Padding(padding: const EdgeInsets.all(16),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -35,12 +35,12 @@ class BildirimListesiKarti extends StatelessWidget{
                         const Expanded(child: Text('FCM Bildirim Merkezi', style: TextStyle(
                             fontSize:16,
                             fontWeight:FontWeight.bold,
-                            color: Color(0xFFF172A),
+                            color: Color(0xFF0F172A),
                         ),),),
                         Switch(
                             value:konuyaAboneMi,
                             onChanged:onAboneDegisti,
-                            activeColor: const Color.fronARGB(15,160,40,50),
+                            activeThumbColor: const Color.fromARGB(15,160,40,50),
                         ),
                     ],
                     ),
@@ -110,7 +110,7 @@ class BildirimListesiKarti extends StatelessWidget{
                         shrinkWrap:true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: bildirimler.length,
-                        separatorBuilder: (_, __)=> const Divider(height: 1),
+                        separatorBuilder: (_, _)=> const Divider(height: 1),
                         itemBuilder: (context,index){
                             final b = bildirimler[index];
                             return ListTile(

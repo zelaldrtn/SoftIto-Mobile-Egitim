@@ -64,7 +64,7 @@ class GorselYuklemeKarti extends StatelessWidget{
                                     width: double.infinity,
                                     height: double.infinity,
                                 ),
-                            ):(yuklenenUrl !=null 
+                            ): yuklenenUrl != null 
                                 ? ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: Image.network(
@@ -88,7 +88,6 @@ class GorselYuklemeKarti extends StatelessWidget{
                                         ),
                                     ],
                                 ), 
-                            ),
                         ),
                         if(yukleniyorMu)...[
                             const SizedBox(height: 12),
@@ -112,7 +111,7 @@ class GorselYuklemeKarti extends StatelessWidget{
                         const SizedBox(height: 14),
                         Row(children: [
                             Expanded(
-                                child: OutlineButton.icon(   
+                                child: OutlinedButton.icon(   
                                     onPressed:yukleniyorMu ? null: onGaleridenSec, 
                                     label: const Text('Galeri'),
                                     icon: const Icon(Icons.photo_library_outlined),

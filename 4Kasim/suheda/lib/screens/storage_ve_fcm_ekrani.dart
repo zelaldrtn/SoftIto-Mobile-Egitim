@@ -37,7 +37,7 @@ class _StorageVeFcmEkraniState extends State<StorageVeFcmEkrani>{
             setState((){
                 _bildirimler.insert(0, BildirimModeli(
                     id: message.messageId ?? DateTime.now().toIso8601String(),
-                    baslik: message.notification?title ?? 'Yeni Bildirim',
+                    baslik: message.notification?.title ?? 'Yeni Bildirim',
                     icerik: message.notification?.body ?? '',
                     tarih: DateTime.now(),
                 ),);
@@ -111,7 +111,7 @@ class _StorageVeFcmEkraniState extends State<StorageVeFcmEkrani>{
     @override
     Widget build(BuildContext context){
         return Scaffold(
-            backgroundColor: const Color(0xFF8FAFC),
+            backgroundColor: const Color(0xFFF8FAFC),
             appBar: AppBar(
                 title: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +144,7 @@ class _StorageVeFcmEkraniState extends State<StorageVeFcmEkrani>{
                             bildirimler: _bildirimler,
                             token: _fcmToken,
                             konuyaAboneMi: _konuyaAboneMi,
-                            onAboneDegisti: _aboneDegistiri
+                            onAboneDegisti: _aboneDegistir
                         ),
                     ],
                 ),

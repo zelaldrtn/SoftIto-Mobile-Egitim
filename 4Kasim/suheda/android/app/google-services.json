@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "690674429429",
+    "project_id": "suheda-mobil",
+    "storage_bucket": "suheda-mobil.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:690674429429:android:305b4a4aac32371752c4bc",
+        "android_client_info": {
+          "package_name": "com.example.suheda"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrjrwxftTEKD3jRmRQdve97su5KNxIJJk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

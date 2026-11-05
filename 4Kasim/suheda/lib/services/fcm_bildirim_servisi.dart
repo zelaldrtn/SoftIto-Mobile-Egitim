@@ -13,11 +13,11 @@ class FcmBildirimServisi{
     }) async{
         await _fcm.requestPermission(alert:true, badge:true, sound:true);
 
-        const androidSetting=AndroidInitializationSettings('@mipmap/ic_launcher');
+        const androidSettings=AndroidInitializationSettings('@mipmap/ic_launcher');
         const iosSettings=DarwinInitializationSettings();
         const initSettings = InitializationSettings(
             android: androidSettings,
-            ios: iosSettings,
+            iOS: iosSettings,
         );
 
         await _localPlugin.initialize(initSettings);
@@ -49,13 +49,13 @@ class FcmBildirimServisi{
             'softit_fcm_channel_id',
             'Softito bildirimleri',
             channelDescription: 'FCM Push bildirimleri',
-            importance: Importance.message,
+            importance: Importance.high,
             priority: Priority.high,
         );
 
         const details=NotificationDetails(
             android: androidDetails,
-            ios: DarwinNotificationDetails(),
+            iOS: DarwinNotificationDetails(),
         );
 
         await _localPlugin.show(

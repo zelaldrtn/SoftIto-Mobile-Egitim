@@ -21,7 +21,7 @@ class StorageServisi{
         required String dosyaAdi,
         String klasor='yuklemeler',
     }){
-        final Reference ref = _storage.ref(),
+        final Reference ref = _storage.ref();
         final metadata = SettableMetadata(
             contentType: 'image/png',
             customMetadata: {'ekleyen': 'Şüheda Mazlum'},
@@ -30,7 +30,7 @@ class StorageServisi{
     }
 
     Future<String> urlGetir(Reference ref) async{
-        return await ref.getDownloadUrl();
+        return await ref.getDownloadURL();
     }
 
     Future<void> dosyaSil(String dosyaYolu) async{
