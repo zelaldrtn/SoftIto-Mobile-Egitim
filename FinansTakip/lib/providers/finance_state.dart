@@ -254,6 +254,23 @@ class FinanceState extends ChangeNotifier {
     final index = _transactions.indexWhere((item) => item.id == tx.id);
     if (index != -1) {
       _transactions[index] = tx;
+
+      // Düzenli ödemeler ile senkronizasyon (Item 3):
+      // Eğer düzenlenen işlem bir düzenli ödeme veya abonelikle eşleşiyorsa tutarını güncelle
+      bool recurringChanged = false;
+      final cleanTxTitle = tx.title.replaceAll(' Ödemesi', '').trim().toLowerCase();
+      for (int i = 0; i < _recurring.length; i++) {
+        final r = _recurring[i];
+        final cleanRecTitle = r.title.replaceAll(' Ödemesi', '').trim().toLowerCase();
+        if (tx.id == 'tx_rec_${r.id}' || cleanTxTitle == cleanRecTitle) {
+          _recurring[i] = r.copyWith(amount: tx.amount);
+          recurringChanged = true;
+        }
+      }
+      if (recurringChanged) {
+        await LocalStorageService.saveRecurring(_recurring);
+      }
+
       notifyListeners();
       await LocalStorageService.saveTransactions(_transactions);
     }
@@ -362,25 +379,73 @@ class FinanceState extends ChangeNotifier {
       final newStatus = !rec.isPaid;
       _recurring[index] = rec.copyWith(isPaid: newStatus);
 
-      // Eğer ödendi olarak işaretlendiyse ve gider olarak eklenmek istenirse:
+      final now = DateTime.now();
       if (newStatus) {
-        final tx = TransactionModel(
-          id: 'tx_rec_${DateTime.now().millisecondsSinceEpoch}',
-          title: '${rec.title} Ödemesi',
-          amount: rec.amount,
-          category: rec.category,
-          date: DateTime.now(),
-          type: TransactionType.expense,
-          isNeed: true,
-          note: 'Düzenli ödeme kaydı',
+        // Ödeme yapıldığında işlem kaydı ekle (Item 4: bütçeden ve bakiyeden düşmesi için)
+        final existingIndex = _transactions.indexWhere(
+          (t) =>
+              t.id == 'tx_rec_${rec.id}' ||
+              (t.title == '${rec.title} Ödemesi' &&
+                  t.date.year == now.year &&
+                  t.date.month == now.month),
         );
-        _transactions.insert(0, tx);
+        if (existingIndex == -1) {
+          final tx = TransactionModel(
+            id: 'tx_rec_${rec.id}',
+            title: '${rec.title} Ödemesi',
+            amount: rec.amount,
+            category: rec.category,
+            date: DateTime.now(),
+            type: TransactionType.expense,
+            isNeed: true,
+            note: 'Düzenli ödeme kaydı',
+          );
+          _transactions.insert(0, tx);
+          await LocalStorageService.saveTransactions(_transactions);
+        }
+
+        // Kategori bütçesi yoksa bütçeler sekmesinde takip edilebilmesi için otomatik ekle
+        final monthKey = '${now.year}-${now.month.toString().padLeft(2, '0')}';
+        final hasCatBudget = _budgets.any((b) => b.month == monthKey && b.category == rec.category);
+        if (!hasCatBudget) {
+          _budgets.add(BudgetLimitModel(
+            id: 'b_${rec.category}_${DateTime.now().millisecondsSinceEpoch}',
+            month: monthKey,
+            category: rec.category,
+            limitAmount: rec.amount * 1.2,
+          ));
+          await LocalStorageService.saveBudgets(_budgets);
+        }
+      } else {
+        // Ödeme geri alındığında ilgili gider işlemini kaldır
+        _transactions.removeWhere((t) =>
+            t.id == 'tx_rec_${rec.id}' ||
+            (t.title == '${rec.title} Ödemesi' &&
+                t.date.year == now.year &&
+                t.date.month == now.month));
         await LocalStorageService.saveTransactions(_transactions);
       }
 
       notifyListeners();
       await LocalStorageService.saveRecurring(_recurring);
     }
+  }
+
+  /// Hazır şablonlarda kullanıcının son güncel fiyatını döndürür (Item 3)
+  double getTemplatePrice(String title, double defaultPrice) {
+    final clean = title.trim().toLowerCase();
+    for (var r in _recurring) {
+      if (r.title.trim().toLowerCase() == clean) {
+        return r.amount;
+      }
+    }
+    for (var t in _transactions) {
+      final tTitle = t.title.replaceAll(' Ödemesi', '').trim().toLowerCase();
+      if (tTitle == clean || t.title.trim().toLowerCase().contains(clean)) {
+        return t.amount;
+      }
+    }
+    return defaultPrice;
   }
 
   /// Tüm verileri ilk demo haline sıfırlama

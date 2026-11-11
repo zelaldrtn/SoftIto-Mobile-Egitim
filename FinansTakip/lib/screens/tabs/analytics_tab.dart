@@ -167,9 +167,11 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                   ],
                 ),
                 const SizedBox(height: 16),
-                EditorialDonutChart(
-                  data: catExpenses,
-                  totalAmount: totalExpense,
+                Center(
+                  child: EditorialDonutChart(
+                    data: catExpenses,
+                    totalAmount: totalExpense,
+                  ),
                 ),
               ],
             ),
@@ -434,28 +436,16 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
             ),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Text(
-                      'MoneyPlan Finansal Karnen',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                      ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'MoneyPlan Finansal Karnen',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.share_outlined, size: 20),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Aylık finansal özet panosu kopyalandı! 📋'),
-                            backgroundColor: AppColors.forestPrimary,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+                  ),
                 ),
                 const Divider(),
                 const SizedBox(height: 10),

@@ -182,6 +182,24 @@ class DemoData {
         category: 'Eğlence',
         limitAmount: 3000.0,
       ),
+      BudgetLimitModel(
+        id: 'budget_demo_kira',
+        month: monthKey,
+        category: 'Kira',
+        limitAmount: 20000.0,
+      ),
+      BudgetLimitModel(
+        id: 'budget_demo_faturalar',
+        month: monthKey,
+        category: 'Faturalar',
+        limitAmount: 2500.0,
+      ),
+      BudgetLimitModel(
+        id: 'budget_demo_abonelik',
+        month: monthKey,
+        category: 'Abonelik',
+        limitAmount: 1000.0,
+      ),
     ];
   }
 

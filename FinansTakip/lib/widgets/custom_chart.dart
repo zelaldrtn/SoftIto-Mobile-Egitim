@@ -50,21 +50,26 @@ class EditorialDonutChart extends StatelessWidget {
     entries.sort((a, b) => b.value.compareTo(a.value));
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SizedBox(
-          height: 180,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CustomPaint(
-                size: const Size(180, 180),
-                painter: _DonutChartPainter(
-                  entries: entries,
-                  total: totalAmount,
-                  colors: chartColors,
-                  strokeWidth: 26,
+        Center(
+          child: SizedBox(
+            width: 180,
+            height: 180,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Center(
+                  child: CustomPaint(
+                    size: const Size(180, 180),
+                    painter: _DonutChartPainter(
+                      entries: entries,
+                      total: totalAmount,
+                      colors: chartColors,
+                      strokeWidth: 26,
+                    ),
+                  ),
                 ),
-              ),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -91,7 +96,8 @@ class EditorialDonutChart extends StatelessWidget {
             ],
           ),
         ),
-        const SizedBox(height: 20),
+      ),
+      const SizedBox(height: 20),
         // Legend (Kategori Açıklamaları)
         Wrap(
           spacing: 12,

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../models/saving_goal_model.dart';
 import '../theme/app_theme.dart';
@@ -88,11 +89,22 @@ class VisionBoardCard extends StatelessWidget {
                     color: accentColor.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: Icon(
-                    _getIconData(goal.iconKey),
-                    color: isDark ? Colors.white : AppColors.forestPrimary,
-                    size: 24,
-                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: goal.imagePath != null && goal.imagePath!.isNotEmpty
+                      ? Image.file(
+                          File(goal.imagePath!),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Icon(
+                            _getIconData(goal.iconKey),
+                            color: isDark ? Colors.white : AppColors.forestPrimary,
+                            size: 24,
+                          ),
+                        )
+                      : Icon(
+                          _getIconData(goal.iconKey),
+                          color: isDark ? Colors.white : AppColors.forestPrimary,
+                          size: 24,
+                        ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(

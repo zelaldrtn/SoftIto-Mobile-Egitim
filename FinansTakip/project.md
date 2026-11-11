@@ -121,3 +121,4 @@ paylaşılabilir aylık özet kartı sunar.
 ekle; gereksiz karmaşıklık veya proje kapsamı dışında teknoloji
 kullanma. Mevcut klasör yapısını incele ve kod yazmadan önce planla. Var
 olan dosyaları ihtiyaç olmadan silme veya yeniden adlandırma.
+

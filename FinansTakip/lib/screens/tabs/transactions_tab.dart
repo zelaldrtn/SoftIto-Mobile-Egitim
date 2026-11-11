@@ -216,11 +216,31 @@ class _TransactionsTabState extends State<TransactionsTab> {
                     ],
                   ),
                 ],
+                const SizedBox(height: 10),
+
+                // İşlem Ekle Butonu (Kartların üstünü kapatmaması için sabit üst alanda - Item 6)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _openAddSheet(context),
+                    icon: const Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                    label: const Text(
+                      'Yeni İşlem Ekle',
+                      style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      backgroundColor: AppColors.forestPrimary,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
 
           // Liste Görünümü
           Expanded(
@@ -245,7 +265,7 @@ class _TransactionsTabState extends State<TransactionsTab> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          'Aşağıdaki butona basarak yeni bir işlem ekleyebilirsiniz.',
+                          'Yukarıdaki butona basarak yeni bir işlem ekleyebilirsiniz.',
                           style: TextStyle(
                             fontSize: 13,
                             color: isDark ? AppColors.darkTextSecondary : AppColors.textMuted,
@@ -255,7 +275,7 @@ class _TransactionsTabState extends State<TransactionsTab> {
                     ),
                   )
                 : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(18, 4, 18, 90),
+                    padding: const EdgeInsets.fromLTRB(18, 4, 18, 30),
                     physics: const BouncingScrollPhysics(),
                     itemCount: filtered.length,
                     separatorBuilder: (_, index) => const SizedBox(height: 10),
@@ -270,18 +290,6 @@ class _TransactionsTabState extends State<TransactionsTab> {
                   ),
           ),
         ],
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 60),
-        child: FloatingActionButton.extended(
-          onPressed: () => _openAddSheet(context),
-          backgroundColor: AppColors.forestPrimary,
-          icon: const Icon(Icons.add_rounded, color: Colors.white),
-          label: const Text(
-            'İşlem Ekle',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-          ),
-        ),
       ),
     );
   }

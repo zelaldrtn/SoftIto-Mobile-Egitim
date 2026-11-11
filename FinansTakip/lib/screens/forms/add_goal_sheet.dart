@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../models/saving_goal_model.dart';
 import '../../theme/app_theme.dart';
 
@@ -25,6 +27,7 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
 
   late int _priority;
   late String _selectedIconKey;
+  String? _imagePath;
 
   final List<Map<String, dynamic>> _iconOptions = [
     {'key': 'laptop', 'label': 'Teknoloji', 'icon': Icons.laptop_mac_rounded},
@@ -49,6 +52,33 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
     _quoteController = TextEditingController(text: init?.quote ?? '');
     _priority = init?.priority ?? 1;
     _selectedIconKey = init?.iconKey ?? 'laptop';
+    _imagePath = init?.imagePath;
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final picker = ImagePicker();
+      final picked = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+      if (picked != null) {
+        setState(() {
+          _imagePath = picked.path;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Fotoğraf seçilemedi: $e'),
+            backgroundColor: AppColors.dreamyCoral,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -84,6 +114,7 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
       priority: _priority,
       iconKey: _selectedIconKey,
       quote: _quoteController.text.trim().isEmpty ? null : _quoteController.text.trim(),
+      imagePath: _imagePath,
     );
 
     widget.onSave(goal);
@@ -286,6 +317,65 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
                   prefixIcon: Icon(Icons.auto_awesome),
                 ),
               ),
+
+              const SizedBox(height: 16),
+
+              // Pinterest Tarzı Fotoğraf Seçimi (Galeriden)
+              Text(
+                'Vision Board Fotoğrafı (Pinterest Tarzı)',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              if (_imagePath != null && _imagePath!.isNotEmpty)
+                Stack(
+                  alignment: Alignment.topRight,
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.file(
+                        File(_imagePath!),
+                        height: 140,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          height: 100,
+                          color: Colors.grey.withOpacity(0.2),
+                          alignment: Alignment.center,
+                          child: const Text('Fotoğraf yüklenemedi'),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: CircleAvatar(
+                        backgroundColor: Colors.black54,
+                        radius: 16,
+                        child: IconButton(
+                          padding: EdgeInsets.zero,
+                          icon: const Icon(Icons.close, size: 16, color: Colors.white),
+                          onPressed: () => setState(() => _imagePath = null),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              else
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _pickImage,
+                    icon: const Icon(Icons.photo_library_outlined, size: 20),
+                    label: const Text('Galeriden Fotoğraf Seç 📸'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                ),
 
               const SizedBox(height: 24),
 

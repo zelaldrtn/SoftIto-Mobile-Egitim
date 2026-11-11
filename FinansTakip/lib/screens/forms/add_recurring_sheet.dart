@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import '../../models/recurring_model.dart';
+import '../../providers/finance_state.dart';
 import '../../theme/app_theme.dart';
 
 class AddRecurringSheet extends StatefulWidget {
+  final RecurringPaymentModel? initialRecurring;
+  final FinanceState? state;
   final Function(RecurringPaymentModel) onSave;
 
-  const AddRecurringSheet({super.key, required this.onSave});
+  const AddRecurringSheet({
+    super.key,
+    this.initialRecurring,
+    this.state,
+    required this.onSave,
+  });
 
   @override
   State<AddRecurringSheet> createState() => _AddRecurringSheetState();
@@ -13,20 +21,35 @@ class AddRecurringSheet extends StatefulWidget {
 
 class _AddRecurringSheetState extends State<AddRecurringSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _amountController = TextEditingController();
+  late TextEditingController _titleController;
+  late TextEditingController _amountController;
 
-  int _selectedDay = 1;
-  String _selectedCategory = 'Abonelik';
-  String _selectedIcon = 'netflix';
+  late int _selectedDay;
+  late String _selectedCategory;
+  late String _selectedIcon;
 
   final List<Map<String, dynamic>> _quickTemplates = [
-    {'title': 'Netflix', 'amount': '299.99', 'cat': 'Abonelik', 'icon': 'netflix'},
-    {'title': 'Spotify', 'amount': '99.99', 'cat': 'Abonelik', 'icon': 'spotify'},
-    {'title': 'Ev Kirası', 'amount': '15000', 'cat': 'Kira', 'icon': 'rent'},
-    {'title': 'İnternet', 'amount': '450', 'cat': 'Faturalar', 'icon': 'wifi'},
-    {'title': 'Spor Salonu', 'amount': '1200', 'cat': 'Sağlık', 'icon': 'gym'},
+    {'title': 'Netflix', 'amount': 299.99, 'cat': 'Abonelik', 'icon': 'netflix'},
+    {'title': 'Spotify', 'amount': 99.99, 'cat': 'Abonelik', 'icon': 'spotify'},
+    {'title': 'Ev Kirası', 'amount': 17500.0, 'cat': 'Kira', 'icon': 'rent'},
+    {'title': 'İnternet', 'amount': 450.0, 'cat': 'Faturalar', 'icon': 'wifi'},
+    {'title': 'Spor Salonu', 'amount': 1200.0, 'cat': 'Sağlık', 'icon': 'gym'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    final init = widget.initialRecurring;
+    _titleController = TextEditingController(text: init?.title ?? '');
+    _amountController = TextEditingController(
+      text: init != null
+          ? (init.amount % 1 == 0 ? init.amount.toInt().toString() : init.amount.toString())
+          : '',
+    );
+    _selectedDay = init?.dueDay ?? 1;
+    _selectedCategory = init?.category ?? 'Abonelik';
+    _selectedIcon = init?.iconKey ?? 'netflix';
+  }
 
   @override
   void dispose() {
@@ -47,13 +70,13 @@ class _AddRecurringSheetState extends State<AddRecurringSheet> {
     }
 
     final rec = RecurringPaymentModel(
-      id: 'rec_${DateTime.now().millisecondsSinceEpoch}',
+      id: widget.initialRecurring?.id ?? 'rec_${DateTime.now().millisecondsSinceEpoch}',
       title: _titleController.text.trim(),
       amount: amt,
       category: _selectedCategory,
       dueDay: _selectedDay,
-      repeatType: 'Aylık',
-      isPaid: false,
+      repeatType: widget.initialRecurring?.repeatType ?? 'Aylık',
+      isPaid: widget.initialRecurring?.isPaid ?? false,
       iconKey: _selectedIcon,
     );
 
@@ -61,8 +84,12 @@ class _AddRecurringSheetState extends State<AddRecurringSheet> {
     Navigator.pop(context);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Düzenli ödeme eklendi ✓'),
+      SnackBar(
+        content: Text(
+          widget.initialRecurring == null
+              ? 'Düzenli ödeme eklendi ✓'
+              : 'Düzenli ödeme güncellendi ✓',
+        ),
         backgroundColor: AppColors.forestPrimary,
       ),
     );
@@ -123,11 +150,17 @@ class _AddRecurringSheetState extends State<AddRecurringSheet> {
                   separatorBuilder: (_, index) => const SizedBox(width: 8),
                   itemBuilder: (context, index) {
                     final item = _quickTemplates[index];
+                    final defaultPrice = (item['amount'] as num).toDouble();
+                    final dynamicPrice = widget.state?.getTemplatePrice(item['title'] as String, defaultPrice) ?? defaultPrice;
+                    final priceStr = dynamicPrice % 1 == 0
+                        ? dynamicPrice.toInt().toString()
+                        : dynamicPrice.toStringAsFixed(2);
+
                     return InkWell(
                       onTap: () {
                         setState(() {
                           _titleController.text = item['title'];
-                          _amountController.text = item['amount'];
+                          _amountController.text = priceStr;
                           _selectedCategory = item['cat'];
                           _selectedIcon = item['icon'];
                         });
@@ -141,7 +174,7 @@ class _AddRecurringSheetState extends State<AddRecurringSheet> {
                           border: Border.all(color: AppColors.dreamyLilac.withOpacity(0.4)),
                         ),
                         child: Text(
-                          item['title'],
+                          '${item['title']} (₺$priceStr)',
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,

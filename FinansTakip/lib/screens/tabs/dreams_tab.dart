@@ -3,7 +3,7 @@ import '../../models/saving_goal_model.dart';
 import '../../providers/finance_state.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
-import '../../widgets/vision_board_card.dart';
+import '../../widgets/pinterest_goal_card.dart';
 import '../forms/add_goal_sheet.dart';
 import '../forms/deposit_goal_dialog.dart';
 
@@ -70,7 +70,7 @@ class DreamsTab extends StatelessWidget {
       backgroundColor: Colors.transparent,
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(18, 12, 18, 90),
+        padding: const EdgeInsets.fromLTRB(18, 12, 18, 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -193,11 +193,12 @@ class DreamsTab extends StatelessWidget {
 
             const SizedBox(height: 24),
 
+            // Pinterest Panosu Başlık ve Hedef Ekle Butonu (Kartların üstünü kapatmaması için - Item 6)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Tasarruf Hedeflerin',
+                  'Pinterest Panosu 📌',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
@@ -205,68 +206,101 @@ class DreamsTab extends StatelessWidget {
                     color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                   ),
                 ),
-                TextButton.icon(
+                ElevatedButton.icon(
                   onPressed: () => _openAddGoal(context),
-                  icon: const Icon(Icons.add, size: 16),
-                  label: const Text('Yeni Hedef'),
+                  icon: const Icon(Icons.add_photo_alternate_rounded, size: 16, color: Colors.white),
+                  label: const Text(
+                    'Hedef Ekle',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.dreamyLilac,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
                 ),
               ],
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 14),
 
+            // Pinterest Tarzı 2 Sütunlu Masonry Grid (Item 5)
             if (goals.isEmpty)
               Container(
                 padding: const EdgeInsets.all(32),
                 alignment: Alignment.center,
                 child: Column(
                   children: [
-                    Icon(Icons.flag_outlined, size: 48, color: Colors.grey.withOpacity(0.4)),
+                    Icon(Icons.photo_library_outlined, size: 48, color: Colors.grey.withOpacity(0.4)),
                     const SizedBox(height: 12),
                     const Text('Henüz bir birikim hedefi eklemediniz.'),
                     const SizedBox(height: 8),
                     ElevatedButton(
                       onPressed: () => _openAddGoal(context),
-                      child: const Text('İlk Hedefini Belirle'),
+                      child: const Text('İlk Hedefini ve Fotoğrafını Belirle'),
                     ),
                   ],
                 ),
               )
             else
-              ...goals.map((goal) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: VisionBoardCard(
-                    goal: goal,
-                    onCardTap: () => _openAddGoal(context, goal: goal),
-                    onDepositTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (_) => DepositGoalDialog(
-                          goal: goal,
-                          onDeposit: (amt, note) {
-                            state.depositToGoal(goal.id, amt, note: note);
-                          },
-                        ),
-                      );
-                    },
-                    onDeleteTap: () => _showDeleteGoalDialog(context, goal),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Sol Sütun (Çift indeksli hedefler)
+                  Expanded(
+                    child: Column(
+                      children: [
+                        for (int i = 0; i < goals.length; i += 2)
+                          PinterestGoalCard(
+                            goal: goals[i],
+                            index: i,
+                            onTap: () => _openAddGoal(context, goal: goals[i]),
+                            onDepositTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => DepositGoalDialog(
+                                  goal: goals[i],
+                                  onDeposit: (amt, note) {
+                                    state.depositToGoal(goals[i].id, amt, note: note);
+                                  },
+                                ),
+                              );
+                            },
+                            onDeleteTap: () => _showDeleteGoalDialog(context, goals[i]),
+                          ),
+                      ],
+                    ),
                   ),
-                );
-              }),
+                  const SizedBox(width: 12),
+                  // Sağ Sütun (Tek indeksli hedefler)
+                  Expanded(
+                    child: Column(
+                      children: [
+                        for (int i = 1; i < goals.length; i += 2)
+                          PinterestGoalCard(
+                            goal: goals[i],
+                            index: i,
+                            onTap: () => _openAddGoal(context, goal: goals[i]),
+                            onDepositTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (_) => DepositGoalDialog(
+                                  goal: goals[i],
+                                  onDeposit: (amt, note) {
+                                    state.depositToGoal(goals[i].id, amt, note: note);
+                                  },
+                                ),
+                              );
+                            },
+                            onDeleteTap: () => _showDeleteGoalDialog(context, goals[i]),
+                          ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
           ],
-        ),
-      ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 60),
-        child: FloatingActionButton.extended(
-          onPressed: () => _openAddGoal(context),
-          backgroundColor: AppColors.dreamyLilac,
-          icon: const Icon(Icons.add_task_rounded, color: Colors.white),
-          label: const Text(
-            'Hedef Ekle',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700),
-          ),
         ),
       ),
     );

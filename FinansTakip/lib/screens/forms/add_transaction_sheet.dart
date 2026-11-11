@@ -49,7 +49,11 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
     final init = widget.initialTransaction;
     _titleController = TextEditingController(text: init?.title ?? '');
     _amountController = TextEditingController(
-      text: init != null ? init.amount.toStringAsFixed(2) : '',
+      text: init != null
+          ? (init.amount % 1 == 0
+              ? init.amount.toInt().toString()
+              : init.amount.toString())
+          : '',
     );
     _noteController = TextEditingController(text: init?.note ?? '');
     _selectedType = init?.type ?? TransactionType.expense;
@@ -235,12 +239,28 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
               // Tutar Input
               TextFormField(
                 controller: _amountController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
+                keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
+                textInputAction: TextInputAction.next,
+                decoration: InputDecoration(
                   labelText: 'Tutar (₺)',
-                  hintText: '0,00',
-                  prefixIcon: Icon(Icons.attach_money_rounded),
+                  hintText: '0',
+                  prefixIcon: const Icon(Icons.attach_money_rounded),
+                  suffixIcon: _amountController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear_rounded, size: 18),
+                          onPressed: () {
+                            setState(() {
+                              _amountController.clear();
+                            });
+                          },
+                        )
+                      : null,
                 ),
+                onChanged: (_) {
+                  if (_amountController.text.length <= 1) {
+                    setState(() {});
+                  }
+                },
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Lütfen bir tutar giriniz.';

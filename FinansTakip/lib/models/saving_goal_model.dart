@@ -7,6 +7,7 @@ class SavingGoalModel {
   final String iconKey; // 'travel', 'car', 'house', 'laptop', 'wedding', 'emergency'
   final String? quote; // Motive edici söz/not
   final String? colorHex; // Özel renk vurgusu
+  final String? imagePath; // Kullanıcının galeriden seçtiği fotoğraf yolu
 
   SavingGoalModel({
     required this.id,
@@ -17,6 +18,7 @@ class SavingGoalModel {
     this.iconKey = 'laptop',
     this.quote,
     this.colorHex,
+    this.imagePath,
   });
 
   double get progressRatio {
@@ -41,6 +43,7 @@ class SavingGoalModel {
     String? iconKey,
     String? quote,
     String? colorHex,
+    String? imagePath,
   }) {
     return SavingGoalModel(
       id: id ?? this.id,
@@ -51,6 +54,7 @@ class SavingGoalModel {
       iconKey: iconKey ?? this.iconKey,
       quote: quote ?? this.quote,
       colorHex: colorHex ?? this.colorHex,
+      imagePath: imagePath ?? this.imagePath,
     );
   }
 
@@ -64,6 +68,7 @@ class SavingGoalModel {
       'iconKey': iconKey,
       'quote': quote,
       'colorHex': colorHex,
+      'imagePath': imagePath,
     };
   }
 
@@ -77,6 +82,7 @@ class SavingGoalModel {
       iconKey: (map['iconKey'] as String?) ?? 'laptop',
       quote: map['quote'] as String?,
       colorHex: map['colorHex'] as String?,
+      imagePath: map['imagePath'] as String?,
     );
   }
 }
