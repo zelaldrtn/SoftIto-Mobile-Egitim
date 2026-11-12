@@ -40,10 +40,8 @@ class FinanceState extends ChangeNotifier {
 
   // Kimlik Doğrulama Bilgileri
   bool get isAuthenticated => SupabaseService.instance.isAuthenticated;
-  String get userEmail => SupabaseService.instance.currentUser?.email ?? 'kullanici@moneyplan.app';
-  String get userFullName =>
-      (SupabaseService.instance.currentUser?.userMetadata?['full_name'] as String?) ??
-      'Zelal Dartan';
+  String get userEmail => SupabaseService.instance.userEmail;
+  String get userFullName => SupabaseService.instance.userFullName;
 
   FinanceState() {
     init();

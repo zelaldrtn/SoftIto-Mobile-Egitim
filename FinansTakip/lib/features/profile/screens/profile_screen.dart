@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/services/supabase_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../providers/finance_state.dart';
 import '../../auth/screens/auth_dialog.dart';
@@ -173,7 +174,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
-                          isAuth ? 'Supabase Bağlantılı' : 'Yerel / Demo Hesabı',
+                          isAuth
+                              ? (SupabaseService.instance.isInitialized
+                                  ? 'Supabase Bağlantılı'
+                                  : 'Yerel Hesap (Giriş Yapıldı)')
+                              : 'Misafir / Demo Hesabı',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,

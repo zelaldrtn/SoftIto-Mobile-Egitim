@@ -42,5 +42,11 @@ class AppConstants {
   static const String keyNotifyRecurring = 'moneyplan_notify_recurring';
   static const String keyNotifySavings = 'moneyplan_notify_savings';
   static const String keyExchangeRates = 'moneyplan_exchange_rates';
+  static const String keySupabaseUrl = 'moneyplan_supabase_url';
+  static const String keySupabaseAnonKey = 'moneyplan_supabase_anon_key';
+  static const String keyLocalIsAuth = 'moneyplan_local_is_auth';
+  static const String keyLocalUserEmail = 'moneyplan_local_user_email';
+  static const String keyLocalUserName = 'moneyplan_local_user_name';
+  static const String keyLocalUserPassword = 'moneyplan_local_user_pw';
 }
 

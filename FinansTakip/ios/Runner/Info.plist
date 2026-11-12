@@ -68,6 +68,8 @@
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Hayalleriniz için galerinizden fotoğraf seçmenizi sağlar.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Hayalleriniz için fotoğraf kaydetmenizi sağlar.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Hayalleriniz için fotoğraf çekmenizi sağlar.</string>
 </dict>

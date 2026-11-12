@@ -303,10 +303,14 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                   ),
                 ),
                 const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 6,
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(width: 10, height: 10, color: AppColors.forestPrimary),
                         const SizedBox(width: 6),
@@ -321,6 +325,7 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                       ],
                     ),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(width: 10, height: 10, color: AppColors.dreamyYellow),
                         const SizedBox(width: 6),

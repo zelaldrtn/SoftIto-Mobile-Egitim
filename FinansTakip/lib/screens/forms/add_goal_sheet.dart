@@ -58,18 +58,26 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
   Future<void> _pickImage() async {
     try {
       final picker = ImagePicker();
-      final picked = await picker.pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
+      XFile? picked;
+      try {
+        picked = await picker.pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 1200,
+          maxHeight: 1200,
+          imageQuality: 85,
+        );
+      } catch (innerError) {
+        debugPrint('Yeniden boyutlandırma başarısız oldu, doğrudan seçiliyor: $innerError');
+        picked = await picker.pickImage(source: ImageSource.gallery);
+      }
+
       if (picked != null) {
         setState(() {
-          _imagePath = picked.path;
+          _imagePath = picked!.path;
         });
       }
     } catch (e) {
+      debugPrint('Fotoğraf seçme hatası: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -320,9 +328,9 @@ class _AddGoalSheetState extends State<AddGoalSheet> {
 
               const SizedBox(height: 16),
 
-              // Pinterest Tarzı Fotoğraf Seçimi (Galeriden)
+              // Vision Board Fotoğraf Seçimi (Galeriden)
               Text(
-                'Vision Board Fotoğrafı (Pinterest Tarzı)',
+                'Vision Board Fotoğrafı',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,

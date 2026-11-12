@@ -193,12 +193,12 @@ class DreamsTab extends StatelessWidget {
 
             const SizedBox(height: 24),
 
-            // Pinterest Panosu Başlık ve Hedef Ekle Butonu (Kartların üstünü kapatmaması için - Item 6)
+            // Hayal Panosu Başlık ve Hedef Ekle Butonu (Kartların üstünü kapatmaması için - Item 6)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Pinterest Panosu 📌',
+                  'Hayal Panosu 📌',
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,

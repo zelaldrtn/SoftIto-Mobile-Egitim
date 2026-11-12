@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Hayalleriniz için galerinizden fotoğraf seçmenizi sağlar.</string>
 </dict>
 </plist>

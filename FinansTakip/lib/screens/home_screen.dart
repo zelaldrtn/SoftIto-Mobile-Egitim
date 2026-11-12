@@ -130,6 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 16,
         title: Row(
           children: [
             Container(
@@ -138,16 +139,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: AppColors.forestPrimary,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.spa_rounded, color: Colors.white, size: 18),
+              child: const Icon(Icons.spa_rounded, color: Colors.white, size: 16),
             ),
-            const SizedBox(width: 10),
-            Text(
-              _appBarTitle,
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.5,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                _appBarTitle,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.5,
+                  color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                ),
               ),
             ),
           ],
@@ -156,27 +161,39 @@ class _HomeScreenState extends State<HomeScreen> {
           // Hesaplarım ve Kartlarım Butonu
           IconButton(
             tooltip: 'Hesaplarım ve Kartlarım',
-            icon: const Icon(Icons.account_balance_wallet_outlined),
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(),
+            icon: const Icon(Icons.account_balance_wallet_outlined, size: 21),
             onPressed: () => _openAccounts(context),
           ),
           // Tema Değiştirme Butonu (Açık / Koyu)
           IconButton(
             tooltip: isDark ? 'Açık Mod' : 'Koyu Mod',
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(),
             icon: Icon(
               isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
               color: isDark ? AppColors.dreamyYellow : AppColors.forestPrimary,
+              size: 21,
             ),
             onPressed: widget.state.toggleTheme,
           ),
           // Profil Butonu
           IconButton(
             tooltip: 'Profil ve Ayarlar',
-            icon: const Icon(Icons.person_outline_rounded),
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.all(6),
+            constraints: const BoxConstraints(),
+            icon: const Icon(Icons.person_outline_rounded, size: 21),
             onPressed: () => _openProfile(context),
           ),
           // Seçenekler Menüsü
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert_rounded),
+            icon: const Icon(Icons.more_vert_rounded, size: 21),
+            padding: const EdgeInsets.symmetric(horizontal: 6),
+            constraints: const BoxConstraints(),
             onSelected: (val) {
               if (val == 'reset') {
                 _showResetConfirmDialog();

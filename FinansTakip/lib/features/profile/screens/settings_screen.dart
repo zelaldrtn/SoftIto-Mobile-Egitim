@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/exchange_rate_service.dart';
 import '../../../core/services/notification_service.dart';
+import '../../../core/services/supabase_service.dart';
 import '../../../theme/app_theme.dart';
 import '../../../providers/finance_state.dart';
 
@@ -15,6 +16,78 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  void _showSupabaseConfigDialog(BuildContext context) {
+    final urlController = TextEditingController(text: AppConstants.supabaseUrl);
+    final keyController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Supabase Bağlantısı'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Supabase projenizin URL ve Anon Key bilgilerini girerek verilerinizi canlı bulut veritabanına bağlayabilirsiniz.',
+              style: TextStyle(fontSize: 12, color: Colors.grey),
+            ),
+            const SizedBox(height: 14),
+            TextField(
+              controller: urlController,
+              decoration: const InputDecoration(
+                labelText: 'Supabase URL',
+                hintText: 'https://xxx.supabase.co',
+                prefixIcon: Icon(Icons.link_rounded),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: keyController,
+              obscureText: true,
+              decoration: const InputDecoration(
+                labelText: 'Anon Key (API Key)',
+                hintText: 'eyJhbGciOi...',
+                prefixIcon: Icon(Icons.vpn_key_rounded),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Vazgeç')),
+          ElevatedButton(
+            onPressed: () async {
+              final url = urlController.text.trim();
+              final key = keyController.text.trim();
+              if (url.isNotEmpty && key.isNotEmpty) {
+                final messenger = ScaffoldMessenger.of(context);
+                Navigator.pop(ctx);
+                final success = await SupabaseService.instance.updateSupabaseConfig(
+                  url: url,
+                  anonKey: key,
+                );
+                if (!mounted) return;
+                setState(() {});
+                messenger.showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      success
+                          ? '✅ Supabase bağlantısı başarıyla kuruldu!'
+                          : '⚠️ Supabase bağlantısı kurulamadı. Bilgilerinizi kontrol edin.',
+                    ),
+                    backgroundColor: success ? AppColors.forestPrimary : Colors.red,
+                  ),
+                );
+              }
+            },
+            child: const Text('Kaydet ve Bağlan'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = widget.state.isDarkMode;
@@ -167,7 +240,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const SizedBox(height: 24),
 
-          // 4. Uygulama Hakkında
+          // 4. Bulut & Supabase Durumu
+          const Text('Bulut & Supabase', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 10),
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkCard : Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isDark ? AppColors.darkBorder : AppColors.warmBorder,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      SupabaseService.instance.isInitialized ? Icons.cloud_done_rounded : Icons.cloud_off_rounded,
+                      color: SupabaseService.instance.isInitialized ? AppColors.forestPrimary : Colors.amber.shade700,
+                      size: 22,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            SupabaseService.instance.isInitialized ? 'Supabase Bağlantısı Aktif' : 'Yerel Çevrimdışı Mod',
+                            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                          ),
+                          Text(
+                            SupabaseService.instance.isInitialized
+                                ? 'Verileriniz bulutla senkronize ediliyor.'
+                                : 'Verileriniz cihazınızda güvenle saklanıyor.',
+                            style: const TextStyle(color: Colors.grey, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: () => _showSupabaseConfigDialog(context),
+                  icon: const Icon(Icons.settings_ethernet_rounded, size: 16),
+                  label: const Text('Supabase API Anahtarını Ayarla', style: TextStyle(fontSize: 12)),
+                  style: OutlinedButton.styleFrom(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // 5. Uygulama Hakkında
           Center(
             child: Column(
               children: [

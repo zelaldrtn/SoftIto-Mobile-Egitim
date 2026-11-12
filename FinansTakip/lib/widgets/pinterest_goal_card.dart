@@ -88,11 +88,23 @@ class PinterestGoalCard extends StatelessWidget {
                   height: imageHeight,
                   width: double.infinity,
                   child: hasImage
-                      ? Image.file(
-                          File(goal.imagePath!),
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => _buildFallbackMood(index),
-                        )
+                      ? (goal.imagePath!.startsWith('http')
+                          ? Image.network(
+                              goal.imagePath!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) => _buildFallbackMood(index),
+                            )
+                          : (goal.imagePath!.startsWith('assets/')
+                              ? Image.asset(
+                                  goal.imagePath!,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => _buildFallbackMood(index),
+                                )
+                              : Image.file(
+                                  File(goal.imagePath!),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) => _buildFallbackMood(index),
+                                )))
                       : _buildFallbackMood(index),
                 ),
 
