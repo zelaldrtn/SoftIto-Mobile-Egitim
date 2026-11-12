@@ -261,8 +261,15 @@ class DreamsTab extends StatelessWidget {
                                 context: context,
                                 builder: (_) => DepositGoalDialog(
                                   goal: goals[i],
-                                  onDeposit: (amt, note) {
-                                    state.depositToGoal(goals[i].id, amt, note: note);
+                                  state: state,
+                                  onDeposit: (amt, note, {sourceCardId, sourceCashAccountId}) {
+                                    state.depositToGoal(
+                                      goals[i].id,
+                                      amt,
+                                      note: note,
+                                      sourceCardId: sourceCardId,
+                                      sourceCashAccountId: sourceCashAccountId,
+                                    );
                                   },
                                 ),
                               );
@@ -287,8 +294,15 @@ class DreamsTab extends StatelessWidget {
                                 context: context,
                                 builder: (_) => DepositGoalDialog(
                                   goal: goals[i],
-                                  onDeposit: (amt, note) {
-                                    state.depositToGoal(goals[i].id, amt, note: note);
+                                  state: state,
+                                  onDeposit: (amt, note, {sourceCardId, sourceCashAccountId}) {
+                                    state.depositToGoal(
+                                      goals[i].id,
+                                      amt,
+                                      note: note,
+                                      sourceCardId: sourceCardId,
+                                      sourceCashAccountId: sourceCashAccountId,
+                                    );
                                   },
                                 ),
                               );

@@ -51,6 +51,7 @@ class _TransactionsTabState extends State<TransactionsTab> {
       context: context,
       isScrollControlled: true,
       builder: (_) => AddTransactionSheet(
+        state: widget.state,
         initialTransaction: tx,
         onSave: (savedTx) {
           if (tx == null) {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_constants.dart';
+import '../../models/transaction_model.dart';
 import '../../providers/finance_state.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
@@ -16,6 +18,7 @@ class AnalyticsTab extends StatefulWidget {
 
 class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  String _selectedPeriod = 'monthly'; // 'weekly', 'monthly', 'yearly'
 
   @override
   void initState() {
@@ -112,11 +115,13 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
     final wantTotal = needVsWant['İstek'] ?? 0;
     final needRatio = totalExpense > 0 ? (needTotal / totalExpense).clamp(0.0, 1.0) : 0.5;
 
-    // En yüksek kategori bul
-    String topCat = 'Bulunamadı';
+    // En çok harcama yapılan kategori
+    String topCat = 'Henüz veri yok';
+    double topAmt = 0.0;
     if (catExpenses.isNotEmpty) {
       final entries = catExpenses.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
       topCat = entries.first.key;
+      topAmt = entries.first.value;
     }
 
     return SingleChildScrollView(
@@ -125,7 +130,19 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Pasta Grafik Kartı
+          // Dönem Seçici Filtre (Haftalık, Aylık, Yıllık)
+          Row(
+            children: [
+              _buildPeriodChip('Haftalık', 'weekly'),
+              const SizedBox(width: 8),
+              _buildPeriodChip('Aylık', 'monthly'),
+              const SizedBox(width: 8),
+              _buildPeriodChip('Yıllık', 'yearly'),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Pasta / Halka Grafik Kartı
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -142,7 +159,7 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Kategori Bazlı Dağılım',
+                      'Kategori Bazlı Gider Dağılımı',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -155,9 +172,11 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                         color: AppColors.forestSoftBg,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Text(
-                        'Bu Ay',
-                        style: TextStyle(
+                      child: Text(
+                        _selectedPeriod == 'weekly'
+                            ? 'Bu Hafta'
+                            : (_selectedPeriod == 'yearly' ? 'Bu Yıl' : 'Bu Ay'),
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: AppColors.forestPrimary,
@@ -177,65 +196,55 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
-          // Akıllı Finansal Yorum Kutusu
-          Container(
-            padding: const EdgeInsets.all(18),
-            decoration: BoxDecoration(
-              color: isDark ? AppColors.darkCardAlt : const Color(0xFFF0F7F2),
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(
-                color: AppColors.forestLight.withOpacity(0.3),
+          // En Çok Harcama Yapılan Kategori Kartı
+          if (catExpenses.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkCardAlt : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: isDark ? AppColors.darkBorder : AppColors.warmBorder,
+                ),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE27396).withOpacity(0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.star_rounded, color: Color(0xFFE27396), size: 22),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'En Çok Harcama Yapılan Kategori',
+                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          topCat,
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    CurrencyFormatter.format(topAmt, currency: widget.state.primaryCurrency),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFFE27396)),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.forestPrimary.withOpacity(0.12),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.psychology_rounded,
-                    color: AppColors.forestPrimary,
-                    size: 22,
-                  ),
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Akıllı Harcama Yorumu',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.forestPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        totalExpense > 0
-                            ? 'Bu ay en yüksek harcama kalemin "$topCat" oldu. İsteğe bağlı harcamaların toplam harcamanın %${(100 - (needRatio * 100)).toStringAsFixed(0)}\'ini oluşturuyor. Tasarruf hedeflerine sadık kalıyorsun!'
-                            : 'Bu ay henüz harcama verisi girilmedi. Harcamalarını kaydettikçe burada kişiselleştirilmiş içgörüler göreceksin.',
-                        style: TextStyle(
-                          fontSize: 13,
-                          height: 1.4,
-                          color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
+            const SizedBox(height: 18),
+          ],
 
           // İstek vs İhtiyaç Oranı Kartı
           Container(
@@ -302,7 +311,7 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                         Container(width: 10, height: 10, color: AppColors.forestPrimary),
                         const SizedBox(width: 6),
                         Text(
-                          'Zorunlu İhtiyaç: ${CurrencyFormatter.format(needTotal, showDecimals: false)} (%${(needRatio * 100).toStringAsFixed(0)})',
+                          'Zorunlu İhtiyaç: ${CurrencyFormatter.format(needTotal, showDecimals: false, currency: widget.state.primaryCurrency)} (%${(needRatio * 100).toStringAsFixed(0)})',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -316,7 +325,7 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                         Container(width: 10, height: 10, color: AppColors.dreamyYellow),
                         const SizedBox(width: 6),
                         Text(
-                          'İstek: ${CurrencyFormatter.format(wantTotal, showDecimals: false)}',
+                          'İstek: ${CurrencyFormatter.format(wantTotal, showDecimals: false, currency: widget.state.primaryCurrency)}',
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -364,9 +373,33 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
     );
   }
 
-  // 2. Görünüm: Dönem Raporları & Bütçe Önerileri
+  // 2. Görünüm: Dönem Raporları & Kart Bazlı Harcama
   Widget _buildReportsTab(BuildContext context, bool isDark) {
     final state = widget.state;
+    final now = DateTime.now();
+
+    // Önceki ay hesaplaması (Karşılaştırma için)
+    final prevMonthDate = DateTime(now.year, now.month - 1, 1);
+    final prevMonthExpenses = state.transactions
+        .where((t) =>
+            t.type == TransactionType.expense &&
+            t.date.year == prevMonthDate.year &&
+            t.date.month == prevMonthDate.month)
+        .fold(0.0, (sum, t) => sum + t.amountInPrimary);
+
+    final expenseDifference = state.thisMonthExpense - prevMonthExpenses;
+    final isExpenseIncreased = expenseDifference > 0;
+
+    // Kart bazlı harcama hesaplaması
+    final Map<String, double> cardExpenses = {};
+    for (var tx in state.transactions) {
+      if (tx.type == TransactionType.expense &&
+          tx.date.year == now.year &&
+          tx.date.month == now.month) {
+        final key = tx.accountName ?? (tx.cardId != null ? 'Kart Harcaması' : 'Nakit Harcama');
+        cardExpenses[key] = (cardExpenses[key] ?? 0.0) + tx.amountInPrimary;
+      }
+    }
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -374,56 +407,145 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Gelecek Ay Bütçe Önerisi Kutusu (AI / Akıllı Tahmin)
+          // Önceki Ayla Karşılaştırma Kartı
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1B4332), Color(0xFF2D6A4F)],
+              gradient: LinearGradient(
+                colors: isExpenseIncreased
+                    ? [const Color(0xFF4A1E2B), const Color(0xFF6B2B3E)]
+                    : [AppColors.forestDeep, AppColors.forestPrimary],
               ),
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.forestDeep.withOpacity(0.2),
-                  blurRadius: 12,
-                  offset: const Offset(0, 5),
+                  color: (isExpenseIncreased ? const Color(0xFF6B2B3E) : AppColors.forestDeep)
+                      .withOpacity(0.3),
+                  blurRadius: 14,
+                  offset: const Offset(0, 6),
                 ),
               ],
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.lightbulb_outline_rounded, color: AppColors.dreamyYellow, size: 22),
-                    SizedBox(width: 8),
-                    Text(
-                      'Gelecek Ay Bütçe Önerileri',
+                    const Text(
+                      'Önceki Ayla Karşılaştırma',
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.w800,
                       ),
+                    ),
+                    Icon(
+                      isExpenseIncreased ? Icons.trending_up_rounded : Icons.trending_down_rounded,
+                      color: AppColors.dreamyYellow,
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
-                const Text(
-                  'Geçmiş harcama ortalamalarına dayanarak Kasım ayı için önerilen tahsisler:',
-                  style: TextStyle(color: Color(0xFFD8EADE), fontSize: 13),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Bu Ayki Gider', style: TextStyle(color: Color(0xFFD8EADE), fontSize: 12)),
+                        const SizedBox(height: 2),
+                        Text(
+                          CurrencyFormatter.format(state.thisMonthExpense, currency: state.primaryCurrency),
+                          style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text('Geçen Ayki Gider', style: TextStyle(color: Color(0xFFD8EADE), fontSize: 12)),
+                        const SizedBox(height: 2),
+                        Text(
+                          CurrencyFormatter.format(prevMonthExpenses, currency: state.primaryCurrency),
+                          style: const TextStyle(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 14),
-                _buildSuggestionRow('Market & Gıda', '₺7.500', 'Geçmiş ortalama: ₺7.000'),
-                _buildSuggestionRow('Faturalar & Sabit', '₺2.200', 'Mevcut abonelikler dahil'),
-                _buildSuggestionRow('Yeme-İçme & Sosyal', '₺4.000', 'Tasarruf için %10 azaltıldı'),
-                _buildSuggestionRow('Hedef Birikim Payı', '₺8.000', 'Tokyo seyahati fonuna'),
+                const SizedBox(height: 10),
+                Text(
+                  prevMonthExpenses > 0
+                      ? (isExpenseIncreased
+                          ? 'Geçen aya göre ${CurrencyFormatter.format(expenseDifference.abs(), currency: state.primaryCurrency)} daha fazla harcama yapıldı.'
+                          : 'Geçen aya göre ${CurrencyFormatter.format(expenseDifference.abs(), currency: state.primaryCurrency)} tasarruf sağlandı!')
+                      : 'Geçmiş ay verisi sınırlı. İşlemleriniz kaydedildikçe karşılaştırma netleşecektir.',
+                  style: const TextStyle(color: AppColors.dreamyYellow, fontSize: 12, fontWeight: FontWeight.w600),
+                ),
               ],
             ),
           ),
 
           const SizedBox(height: 20),
 
-          // Paylaşılabilir Aylık Özet Kartı
+          // Kart / Hesap Bazlı Harcama Dağılımı
+          if (cardExpenses.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkCard : Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(
+                  color: isDark ? AppColors.darkBorder : AppColors.warmBorder,
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Hesap & Kart Bazlı Harcama Dağılımı',
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 14),
+                  ...cardExpenses.entries.map((entry) {
+                    final ratio = state.thisMonthExpense > 0
+                        ? (entry.value / state.thisMonthExpense).clamp(0.0, 1.0)
+                        : 0.0;
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(entry.key, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                              Text(
+                                CurrencyFormatter.format(entry.value, currency: state.primaryCurrency),
+                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          LinearProgressIndicator(
+                            value: ratio,
+                            backgroundColor: Colors.grey.withOpacity(0.15),
+                            valueColor: const AlwaysStoppedAnimation(AppColors.forestPrimary),
+                            minHeight: 6,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+
+          // Paylaşılabilir Aylık Karne
           Container(
             padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
@@ -439,7 +561,7 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    'MoneyPlan Finansal Karnen',
+                    '${AppConstants.appName} Finansal Karnen',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
@@ -449,16 +571,16 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
                 ),
                 const Divider(),
                 const SizedBox(height: 10),
-                _buildSummaryStatRow('Toplam Gelir', CurrencyFormatter.format(state.thisMonthIncome)),
-                _buildSummaryStatRow('Toplam Gider', CurrencyFormatter.format(state.thisMonthExpense)),
-                _buildSummaryStatRow('Birikime Ayrılan', CurrencyFormatter.format(state.thisMonthSaving)),
+                _buildSummaryStatRow('Toplam Gelir', CurrencyFormatter.format(state.thisMonthIncome, currency: state.primaryCurrency)),
+                _buildSummaryStatRow('Toplam Gider', CurrencyFormatter.format(state.thisMonthExpense, currency: state.primaryCurrency)),
+                _buildSummaryStatRow('Birikime Ayrılan', CurrencyFormatter.format(state.thisMonthSaving, currency: state.primaryCurrency)),
                 _buildSummaryStatRow(
                   'Tasarruf Oranı',
                   state.thisMonthIncome > 0
                       ? '%${((state.thisMonthSaving / state.thisMonthIncome) * 100).toStringAsFixed(1)}'
                       : '%0',
                 ),
-                _buildSummaryStatRow('Net Kullanılabilir', CurrencyFormatter.format(state.usableMoney)),
+                _buildSummaryStatRow('Net Kullanılabilir', CurrencyFormatter.format(state.usableMoney, currency: state.primaryCurrency)),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -476,35 +598,14 @@ class _AnalyticsTabState extends State<AnalyticsTab> with SingleTickerProviderSt
     );
   }
 
-  Widget _buildSuggestionRow(String title, String amount, String note) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w700),
-              ),
-              Text(
-                note,
-                style: const TextStyle(color: Color(0xFFB4D2BE), fontSize: 11),
-              ),
-            ],
-          ),
-          Text(
-            amount,
-            style: const TextStyle(
-              color: AppColors.dreamyYellow,
-              fontSize: 15,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-        ],
-      ),
+  Widget _buildPeriodChip(String label, String value) {
+    final isSelected = _selectedPeriod == value;
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (val) {
+        if (val) setState(() => _selectedPeriod = value);
+      },
     );
   }
 

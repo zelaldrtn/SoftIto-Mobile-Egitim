@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import '../../core/constants/app_constants.dart';
+import '../../core/constants/app_categories.dart';
+import '../../core/services/exchange_rate_service.dart';
 import '../../models/transaction_model.dart';
+import '../../features/accounts/models/account_model.dart';
+import '../../providers/finance_state.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
 
 class AddTransactionSheet extends StatefulWidget {
   final TransactionModel? initialTransaction;
+  final TransactionType? defaultType;
+  final FinanceState? state;
   final Function(TransactionModel) onSave;
 
   const AddTransactionSheet({
     super.key,
     this.initialTransaction,
+    this.defaultType,
+    this.state,
     required this.onSave,
   });
 
@@ -28,19 +37,13 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   late DateTime _selectedDate;
   late bool _isNeed;
 
-  final List<String> _incomeCategories = ['Maaş', 'Ek Gelir', 'Yatırım', 'Hediye', 'Diğer'];
-  final List<String> _expenseCategories = [
-    'Market',
-    'Yemek',
-    'Kira',
-    'Faturalar',
-    'Giyim',
-    'Ulaşım',
-    'Eğlence',
-    'Sağlık',
-    'Eğitim',
-    'Diğer'
-  ];
+  // Hesap Seçimi
+  String? _selectedCardId;
+  String? _selectedCashAccountId;
+  String _transactionCurrency = AppConstants.currencyTRY;
+
+  final List<String> _incomeCategories = AppCategories.defaultIncomeCategories;
+  final List<String> _expenseCategories = AppCategories.defaultExpenseCategories;
   final List<String> _savingCategories = ['Birikim', 'Altın', 'Döviz', 'Hisse/Fon', 'Kumbara'];
 
   @override
@@ -56,10 +59,27 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
           : '',
     );
     _noteController = TextEditingController(text: init?.note ?? '');
-    _selectedType = init?.type ?? TransactionType.expense;
-    _selectedCategory = init?.category ?? 'Market';
+    _selectedType = init?.type ?? widget.defaultType ?? TransactionType.expense;
+    _selectedCategory = init?.category ?? (_selectedType == TransactionType.income ? 'Maaş' : 'Market');
     _selectedDate = init?.date ?? DateTime.now();
     _isNeed = init?.isNeed ?? true;
+
+    _selectedCardId = init?.cardId;
+    _selectedCashAccountId = init?.cashAccountId;
+    _transactionCurrency = init?.currency ?? AppConstants.currencyTRY;
+
+    // Eğer başlangıçta hesap seçilmemişse ilk uygun hesabı seç
+    if (_selectedCardId == null && _selectedCashAccountId == null && widget.state != null) {
+      if (widget.state!.cards.isNotEmpty) {
+        final card = widget.state!.cards.first;
+        _selectedCardId = card.id;
+        _transactionCurrency = card.currency;
+      } else if (widget.state!.cashAccounts.isNotEmpty) {
+        final cash = widget.state!.cashAccounts.first;
+        _selectedCashAccountId = cash.id;
+        _transactionCurrency = cash.currency;
+      }
+    }
   }
 
   @override
@@ -78,6 +98,8 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
         return _expenseCategories;
       case TransactionType.saving:
         return _savingCategories;
+      case TransactionType.debtPayment:
+        return ['Borç Ödemesi'];
     }
   }
 
@@ -100,7 +122,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: AppColors.forestPrimary,
               onPrimary: Colors.white,
               surface: Colors.white,
@@ -121,6 +143,17 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
 
+    // Hesap seçimi zorunlu kontrolü (Bölüm 8)
+    if (_selectedCardId == null && _selectedCashAccountId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Lütfen işlemin yapılacağı kart veya nakit hesabını seçiniz.'),
+          backgroundColor: AppColors.dreamyCoral,
+        ),
+      );
+      return;
+    }
+
     final title = _titleController.text.trim();
     final amountString = _amountController.text.replaceAll(',', '.').trim();
     final amount = double.tryParse(amountString);
@@ -135,6 +168,29 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       return;
     }
 
+    // Seçilen hesap adını bul
+    String? accountName;
+    if (widget.state != null) {
+      if (_selectedCardId != null) {
+        final card = widget.state!.cards.firstWhere((c) => c.id == _selectedCardId);
+        accountName = card.cardName;
+      } else if (_selectedCashAccountId != null) {
+        final cash = widget.state!.cashAccounts.firstWhere((a) => a.id == _selectedCashAccountId);
+        accountName = cash.accountName;
+      }
+    }
+
+    final primaryCur = widget.state?.primaryCurrency ?? AppConstants.currencyTRY;
+    final rate = ExchangeRateService.instance.getRate(
+      from: _transactionCurrency,
+      to: primaryCur,
+    );
+    final convertedAmount = ExchangeRateService.instance.convert(
+      amount,
+      from: _transactionCurrency,
+      to: primaryCur,
+    );
+
     final tx = TransactionModel(
       id: widget.initialTransaction?.id ?? 'tx_${DateTime.now().millisecondsSinceEpoch}',
       title: title,
@@ -144,6 +200,13 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       type: _selectedType,
       isNeed: _isNeed,
       note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+      cardId: _selectedCardId,
+      cashAccountId: _selectedCashAccountId,
+      accountName: accountName,
+      currency: _transactionCurrency,
+      exchangeRate: rate,
+      amountInPrimary: convertedAmount,
+      primaryCurrency: primaryCur,
     );
 
     widget.onSave(tx);
@@ -164,6 +227,8 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cards = widget.state?.cards ?? [];
+    final cashAccounts = widget.state?.cashAccounts ?? [];
 
     return Padding(
       padding: EdgeInsets.only(
@@ -215,14 +280,62 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   ],
                 ),
               ),
-
               const SizedBox(height: 16),
+
+              // 1. Hesap / Kart Seçimi (Bölüm 8: ZORUNLU)
+              DropdownButtonFormField<String>(
+                value: _selectedCardId != null
+                    ? 'card_$_selectedCardId'
+                    : (_selectedCashAccountId != null ? 'cash_$_selectedCashAccountId' : null),
+                decoration: const InputDecoration(
+                  labelText: 'İşlem Yapılacak Hesap / Kart *',
+                  prefixIcon: Icon(Icons.account_balance_wallet_outlined),
+                ),
+                items: [
+                  ...cards.map((c) => DropdownMenuItem(
+                        value: 'card_${c.id}',
+                        child: Text(
+                          '${c.cardName} (${c.bankName} • ${c.cardType == CardType.credit ? 'Kredi' : 'Banka'} • ${c.currency})',
+                        ),
+                      )),
+                  ...cashAccounts.map((a) => DropdownMenuItem(
+                        value: 'cash_${a.id}',
+                        child: Text('${a.accountName} (Nakit • ${a.currency})'),
+                      )),
+                ],
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      if (val.startsWith('card_')) {
+                        final cardId = val.substring(5);
+                        _selectedCardId = cardId;
+                        _selectedCashAccountId = null;
+                        final c = cards.firstWhere((card) => card.id == cardId);
+                        _transactionCurrency = c.currency;
+                      } else if (val.startsWith('cash_')) {
+                        final cashId = val.substring(5);
+                        _selectedCashAccountId = cashId;
+                        _selectedCardId = null;
+                        final a = cashAccounts.firstWhere((acc) => acc.id == cashId);
+                        _transactionCurrency = a.currency;
+                      }
+                    });
+                  }
+                },
+                validator: (val) {
+                  if (val == null || val.isEmpty) {
+                    return 'Lütfen bir hesap seçiniz.';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 14),
 
               // Başlık Input
               TextFormField(
                 controller: _titleController,
                 decoration: const InputDecoration(
-                  labelText: 'İşlem Açıklaması',
+                  labelText: 'İşlem Başlığı',
                   hintText: 'Örn: Haftalık market, Maaş, Kahve...',
                   prefixIcon: Icon(Icons.edit_note_rounded),
                 ),
@@ -233,16 +346,15 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   return null;
                 },
               ),
-
               const SizedBox(height: 14),
 
-              // Tutar Input
+              // Tutar Input (Seçilen hesabın para birimi ile)
               TextFormField(
                 controller: _amountController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true, signed: false),
                 textInputAction: TextInputAction.next,
                 decoration: InputDecoration(
-                  labelText: 'Tutar (₺)',
+                  labelText: 'Tutar (${AppConstants.currencySymbol(_transactionCurrency)})',
                   hintText: '0',
                   prefixIcon: const Icon(Icons.attach_money_rounded),
                   suffixIcon: _amountController.text.isNotEmpty
@@ -256,11 +368,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                         )
                       : null,
                 ),
-                onChanged: (_) {
-                  if (_amountController.text.length <= 1) {
-                    setState(() {});
-                  }
-                },
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Lütfen bir tutar giriniz.';
@@ -272,7 +379,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   return null;
                 },
               ),
-
               const SizedBox(height: 14),
 
               // Kategori Seçimi (Dropdown)
@@ -280,12 +386,21 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                 value: _currentCategories.contains(_selectedCategory)
                     ? _selectedCategory
                     : _currentCategories.first,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Kategori',
-                  prefixIcon: Icon(Icons.category_outlined),
+                  prefixIcon: Icon(AppCategories.getCategoryIcon(_selectedCategory)),
                 ),
                 items: _currentCategories.map((c) {
-                  return DropdownMenuItem(value: c, child: Text(c));
+                  return DropdownMenuItem(
+                    value: c,
+                    child: Row(
+                      children: [
+                        Icon(AppCategories.getCategoryIcon(c), size: 18, color: AppCategories.getCategoryColor(c)),
+                        const SizedBox(width: 8),
+                        Text(c),
+                      ],
+                    ),
+                  );
                 }).toList(),
                 onChanged: (val) {
                   if (val != null) {
@@ -295,7 +410,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   }
                 },
               ),
-
               const SizedBox(height: 14),
 
               // Tarih Seçici Butonu
@@ -337,7 +451,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                 ),
               ),
 
-              // İstek vs İhtiyaç Seçimi (Yalnızca Gider ise göster)
+              // İstek vs İhtiyaç Seçimi (Gider ise)
               if (_selectedType == TransactionType.expense) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -469,7 +583,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   ),
                 ),
               ],
-
               const SizedBox(height: 14),
 
               // Not Input (Opsiyonel)
@@ -477,12 +590,11 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                 controller: _noteController,
                 maxLines: 2,
                 decoration: const InputDecoration(
-                  labelText: 'Not (İsteğe bağlı)',
+                  labelText: 'Açıklama (İsteğe bağlı)',
                   hintText: 'Eklemek istediğiniz özel bir not...',
                   prefixIcon: Icon(Icons.sticky_note_2_outlined),
                 ),
               ),
-
               const SizedBox(height: 24),
 
               // Kaydet Butonu
@@ -495,7 +607,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 24),
             ],
           ),

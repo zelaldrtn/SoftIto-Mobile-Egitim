@@ -10,6 +10,6 @@ void main() {
   testWidgets('MoneyPlanApp smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const MoneyPlanApp());
     await tester.pumpAndSettle();
-    expect(find.text('MoneyPlan'), findsWidgets);
+    expect(find.text('Money Plan'), findsWidgets);
   });
 }

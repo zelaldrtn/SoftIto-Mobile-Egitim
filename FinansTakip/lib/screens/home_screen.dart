@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/constants/app_constants.dart';
 import '../providers/finance_state.dart';
 import '../theme/app_theme.dart';
 import 'tabs/overview_tab.dart';
@@ -7,6 +8,8 @@ import 'tabs/analytics_tab.dart';
 import 'tabs/dreams_tab.dart';
 import 'tabs/budgets_tab.dart';
 import 'forms/add_transaction_sheet.dart';
+import '../features/accounts/screens/accounts_management_sheet.dart';
+import '../features/profile/screens/profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final FinanceState state;
@@ -31,7 +34,26 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       isScrollControlled: true,
       builder: (_) => AddTransactionSheet(
+        state: widget.state,
         onSave: (tx) => widget.state.addTransaction(tx),
+      ),
+    );
+  }
+
+  void _openAccounts(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => AccountsManagementSheet(state: widget.state),
+    );
+  }
+
+  void _openProfile(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProfileScreen(state: widget.state),
       ),
     );
   }
@@ -69,7 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String get _appBarTitle {
     switch (_currentIndex) {
       case 0:
-        return 'MoneyPlan';
+        return AppConstants.appName;
       case 1:
         return 'İşlemlerim';
       case 2:
@@ -79,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case 4:
         return 'Bütçe & Ödemeler';
       default:
-        return 'MoneyPlan';
+        return AppConstants.appName;
     }
   }
 
@@ -131,6 +153,12 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          // Hesaplarım ve Kartlarım Butonu
+          IconButton(
+            tooltip: 'Hesaplarım ve Kartlarım',
+            icon: const Icon(Icons.account_balance_wallet_outlined),
+            onPressed: () => _openAccounts(context),
+          ),
           // Tema Değiştirme Butonu (Açık / Koyu)
           IconButton(
             tooltip: isDark ? 'Açık Mod' : 'Koyu Mod',
@@ -140,6 +168,12 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             onPressed: widget.state.toggleTheme,
           ),
+          // Profil Butonu
+          IconButton(
+            tooltip: 'Profil ve Ayarlar',
+            icon: const Icon(Icons.person_outline_rounded),
+            onPressed: () => _openProfile(context),
+          ),
           // Seçenekler Menüsü
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert_rounded),
@@ -148,6 +182,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 _showResetConfirmDialog();
               } else if (val == 'add') {
                 _openAddTransaction(context);
+              } else if (val == 'accounts') {
+                _openAccounts(context);
+              } else if (val == 'profile') {
+                _openProfile(context);
               }
             },
             itemBuilder: (ctx) => [
@@ -162,6 +200,27 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const PopupMenuItem(
+                value: 'accounts',
+                child: Row(
+                  children: [
+                    Icon(Icons.credit_card, size: 18, color: AppColors.dreamyLilac),
+                    SizedBox(width: 8),
+                    Text('Hesaplar & Kartlar'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem(
+                value: 'profile',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings_outlined, size: 18, color: AppColors.forestPrimary),
+                    SizedBox(width: 8),
+                    Text('Profil & Ayarlar'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem(
                 value: 'reset',
                 child: Row(
                   children: [
@@ -173,12 +232,20 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 6),
         ],
       ),
-      body: IndexedStack(
-        index: _currentIndex,
-        children: pages,
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1200),
+          child: SizedBox.expand(
+            child: IndexedStack(
+              sizing: StackFit.expand,
+              index: _currentIndex,
+              children: pages,
+            ),
+          ),
+        ),
       ),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
@@ -190,48 +257,56 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
-        child: NavigationBar(
-          selectedIndex: _currentIndex,
-          backgroundColor: Colors.transparent,
-          indicatorColor: isDark
-              ? AppColors.forestMint.withOpacity(0.2)
-              : AppColors.forestSoftBg,
-          elevation: 0,
-          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          onDestinationSelected: (index) {
-            setState(() {
-              _currentIndex = index;
-            });
-          },
-          destinations: const [
-            NavigationDestination(
-              icon: Icon(Icons.dashboard_outlined),
-              selectedIcon: Icon(Icons.dashboard_rounded, color: AppColors.forestPrimary),
-              label: 'Genel Bakış',
+        child: SafeArea(
+          child: Center(
+            heightFactor: 1.0,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: NavigationBar(
+              selectedIndex: _currentIndex,
+              backgroundColor: Colors.transparent,
+              indicatorColor: isDark
+                  ? AppColors.forestMint.withOpacity(0.2)
+                  : AppColors.forestSoftBg,
+              elevation: 0,
+              labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+              onDestinationSelected: (index) {
+                setState(() {
+                  _currentIndex = index;
+                });
+              },
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.dashboard_outlined),
+                  selectedIcon: Icon(Icons.dashboard_rounded, color: AppColors.forestPrimary),
+                  label: 'Genel Bakış',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.receipt_long_outlined),
+                  selectedIcon: Icon(Icons.receipt_long_rounded, color: AppColors.forestPrimary),
+                  label: 'İşlemler',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.donut_large_outlined),
+                  selectedIcon: Icon(Icons.donut_large_rounded, color: AppColors.forestPrimary),
+                  label: 'Analizler',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.auto_awesome_outlined),
+                  selectedIcon: Icon(Icons.auto_awesome_rounded, color: AppColors.dreamyLilac),
+                  label: 'Hayallerim',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.calendar_month_outlined),
+                  selectedIcon: Icon(Icons.calendar_month_rounded, color: AppColors.forestPrimary),
+                  label: 'Bütçe',
+                ),
+              ],
             ),
-            NavigationDestination(
-              icon: Icon(Icons.receipt_long_outlined),
-              selectedIcon: Icon(Icons.receipt_long_rounded, color: AppColors.forestPrimary),
-              label: 'İşlemler',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.donut_large_outlined),
-              selectedIcon: Icon(Icons.donut_large_rounded, color: AppColors.forestPrimary),
-              label: 'Analizler',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.auto_awesome_outlined),
-              selectedIcon: Icon(Icons.auto_awesome_rounded, color: AppColors.dreamyLilac),
-              label: 'Hayallerim',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.calendar_month_outlined),
-              selectedIcon: Icon(Icons.calendar_month_rounded, color: AppColors.forestPrimary),
-              label: 'Bütçe',
-            ),
-          ],
+          ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

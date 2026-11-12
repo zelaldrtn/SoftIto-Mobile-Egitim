@@ -1,27 +1,70 @@
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import '../core/constants/app_constants.dart';
 
 class CurrencyFormatter {
-  static final NumberFormat _currencyFormat = NumberFormat.currency(
+  static final NumberFormat _tryFormat = NumberFormat.currency(
     locale: 'tr_TR',
     symbol: '₺',
     decimalDigits: 2,
   );
 
-  static final NumberFormat _compactCurrencyFormat = NumberFormat.currency(
+  static final NumberFormat _tryCompactFormat = NumberFormat.currency(
     locale: 'tr_TR',
     symbol: '₺',
     decimalDigits: 0,
   );
 
-  static String format(double amount, {bool showDecimals = true}) {
+  static final NumberFormat _usdFormat = NumberFormat.currency(
+    locale: 'en_US',
+    symbol: '\$',
+    decimalDigits: 2,
+  );
+
+  static final NumberFormat _usdCompactFormat = NumberFormat.currency(
+    locale: 'en_US',
+    symbol: '\$',
+    decimalDigits: 0,
+  );
+
+  static final NumberFormat _eurFormat = NumberFormat.currency(
+    locale: 'de_DE',
+    symbol: '€',
+    decimalDigits: 2,
+  );
+
+  static final NumberFormat _eurCompactFormat = NumberFormat.currency(
+    locale: 'de_DE',
+    symbol: '€',
+    decimalDigits: 0,
+  );
+
+  static String format(
+    double amount, {
+    bool showDecimals = true,
+    String currency = AppConstants.currencyTRY,
+  }) {
     try {
-      if (!showDecimals || amount % 1 == 0) {
-        return _compactCurrencyFormat.format(amount);
+      final isInt = amount % 1 == 0;
+      final cur = currency.toUpperCase();
+      switch (cur) {
+        case AppConstants.currencyUSD:
+          return (!showDecimals || isInt)
+              ? _usdCompactFormat.format(amount)
+              : _usdFormat.format(amount);
+        case AppConstants.currencyEUR:
+          return (!showDecimals || isInt)
+              ? _eurCompactFormat.format(amount)
+              : _eurFormat.format(amount);
+        case AppConstants.currencyTRY:
+        default:
+          return (!showDecimals || isInt)
+              ? _tryCompactFormat.format(amount)
+              : _tryFormat.format(amount);
       }
-      return _currencyFormat.format(amount);
     } catch (_) {
-      return '₺${amount.toStringAsFixed(showDecimals ? 2 : 0)}';
+      final sym = AppConstants.currencySymbol(currency);
+      return '$sym${amount.toStringAsFixed(showDecimals ? 2 : 0)}';
     }
   }
 

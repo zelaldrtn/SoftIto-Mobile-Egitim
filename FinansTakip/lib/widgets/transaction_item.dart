@@ -51,6 +51,8 @@ class TransactionItem extends StatelessWidget {
         return AppColors.dreamyCoral;
       case TransactionType.saving:
         return AppColors.dreamyLilac;
+      case TransactionType.debtPayment:
+        return const Color(0xFF3A86FF);
     }
   }
 
@@ -62,6 +64,8 @@ class TransactionItem extends StatelessWidget {
         return '-';
       case TransactionType.saving:
         return '✦';
+      case TransactionType.debtPayment:
+        return '💳 ';
     }
   }
 
@@ -198,7 +202,7 @@ class TransactionItem extends StatelessWidget {
 
               // Tutar
               Text(
-                '${_getPrefix()}${CurrencyFormatter.format(transaction.amount)}',
+                '${_getPrefix()}${CurrencyFormatter.format(transaction.amount, currency: transaction.currency)}',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w800,
