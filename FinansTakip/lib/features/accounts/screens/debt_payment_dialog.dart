@@ -158,6 +158,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
 
               // Ödenecek Kredi Kartı Seçimi
               DropdownButtonFormField<String>(
+                isExpanded: true,
                 value: card.id,
                 decoration: const InputDecoration(
                   labelText: 'Borcu Ödenecek Kart',
@@ -166,7 +167,11 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
                 items: creditCards.map((c) {
                   return DropdownMenuItem(
                     value: c.id,
-                    child: Text('${c.cardName} (${c.bankName})'),
+                    child: Text(
+                      '${c.cardName} (${c.bankName})',
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -256,6 +261,7 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
               // Kaynak Hesap Seçici
               if (_sourceType == 'debit_card' && debitCards.isNotEmpty) ...[
                 DropdownButtonFormField<String>(
+                  isExpanded: true,
                   value: _selectedSourceCardId,
                   decoration: const InputDecoration(
                     labelText: 'Ödeme Yapılacak Banka Kartı',
@@ -264,13 +270,18 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
                   items: debitCards.map((c) {
                     return DropdownMenuItem(
                       value: c.id,
-                      child: Text('${c.cardName} (${CurrencyFormatter.format(c.currentBalance, currency: c.currency)})'),
+                      child: Text(
+                        '${c.cardName} (${CurrencyFormatter.format(c.currentBalance, currency: c.currency)})',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     );
                   }).toList(),
                   onChanged: (val) => setState(() => _selectedSourceCardId = val),
                 ),
               ] else if (_sourceType == 'cash_account' && cashAccounts.isNotEmpty) ...[
                 DropdownButtonFormField<String>(
+                  isExpanded: true,
                   value: _selectedSourceCashId,
                   decoration: const InputDecoration(
                     labelText: 'Ödeme Yapılacak Nakit Hesabı',
@@ -279,7 +290,11 @@ class _DebtPaymentDialogState extends State<DebtPaymentDialog> {
                   items: cashAccounts.map((a) {
                     return DropdownMenuItem(
                       value: a.id,
-                      child: Text('${a.accountName} (${CurrencyFormatter.format(a.balance, currency: a.currency)})'),
+                      child: Text(
+                        '${a.accountName} (${CurrencyFormatter.format(a.balance, currency: a.currency)})',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
                     );
                   }).toList(),
                   onChanged: (val) => setState(() => _selectedSourceCashId = val),

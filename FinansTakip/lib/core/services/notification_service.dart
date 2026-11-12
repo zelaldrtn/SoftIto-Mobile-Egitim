@@ -35,6 +35,7 @@ class NotificationService {
     debugPrint('🔔 [NotificationService] Yerel bildirim servisi başlatıldı (Web uyumlu).');
   }
 
+//bu fonksiyon ile bildirimleri ekliyoruz.
   void addNotification({
     required String title,
     required String message,

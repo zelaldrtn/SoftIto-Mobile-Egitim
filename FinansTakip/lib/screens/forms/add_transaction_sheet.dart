@@ -284,6 +284,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
 
               // 1. Hesap / Kart Seçimi (Bölüm 8: ZORUNLU)
               DropdownButtonFormField<String>(
+                isExpanded: true,
                 value: _selectedCardId != null
                     ? 'card_$_selectedCardId'
                     : (_selectedCashAccountId != null ? 'cash_$_selectedCashAccountId' : null),
@@ -296,11 +297,17 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                         value: 'card_${c.id}',
                         child: Text(
                           '${c.cardName} (${c.bankName} • ${c.cardType == CardType.credit ? 'Kredi' : 'Banka'} • ${c.currency})',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       )),
                   ...cashAccounts.map((a) => DropdownMenuItem(
                         value: 'cash_${a.id}',
-                        child: Text('${a.accountName} (Nakit • ${a.currency})'),
+                        child: Text(
+                          '${a.accountName} (Nakit • ${a.currency})',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       )),
                 ],
                 onChanged: (val) {
@@ -383,6 +390,7 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
 
               // Kategori Seçimi (Dropdown)
               DropdownButtonFormField<String>(
+                isExpanded: true,
                 value: _currentCategories.contains(_selectedCategory)
                     ? _selectedCategory
                     : _currentCategories.first,
@@ -394,10 +402,17 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                   return DropdownMenuItem(
                     value: c,
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(AppCategories.getCategoryIcon(c), size: 18, color: AppCategories.getCategoryColor(c)),
                         const SizedBox(width: 8),
-                        Text(c),
+                        Flexible(
+                          child: Text(
+                            c,
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
                       ],
                     ),
                   );

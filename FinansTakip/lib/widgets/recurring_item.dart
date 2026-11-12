@@ -87,6 +87,8 @@ class RecurringItem extends StatelessWidget {
               children: [
                 Text(
                   payment.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
@@ -94,7 +96,10 @@ class RecurringItem extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
                       'Her ayın ${payment.dueDay}. günü',
@@ -103,7 +108,6 @@ class RecurringItem extends StatelessWidget {
                         color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary,
                       ),
                     ),
-                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
@@ -124,6 +128,7 @@ class RecurringItem extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: 8),
 
           // Tutar ve Ödendi Butonu
           Column(

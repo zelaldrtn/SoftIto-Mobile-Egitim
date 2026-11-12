@@ -141,7 +141,10 @@ class TransactionItem extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Row(
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 2,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
                           transaction.category,
@@ -153,7 +156,6 @@ class TransactionItem extends StatelessWidget {
                                 : AppColors.textSecondary,
                           ),
                         ),
-                        const SizedBox(width: 6),
                         Container(
                           width: 3,
                           height: 3,
@@ -162,7 +164,6 @@ class TransactionItem extends StatelessWidget {
                             shape: BoxShape.circle,
                           ),
                         ),
-                        const SizedBox(width: 6),
                         Text(
                           DateFormatter.formatShort(transaction.date),
                           style: TextStyle(
@@ -172,8 +173,7 @@ class TransactionItem extends StatelessWidget {
                                 : AppColors.textMuted,
                           ),
                         ),
-                        if (transaction.type == TransactionType.expense) ...[
-                          const SizedBox(width: 8),
+                        if (transaction.type == TransactionType.expense)
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
@@ -193,7 +193,6 @@ class TransactionItem extends StatelessWidget {
                               ),
                             ),
                           ),
-                        ],
                       ],
                     ),
                   ],

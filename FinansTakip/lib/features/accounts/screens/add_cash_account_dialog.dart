@@ -102,6 +102,7 @@ class _AddCashAccountDialogState extends State<AddCashAccountDialog> {
               const SizedBox(height: 12),
 
               DropdownButtonFormField<String>(
+                isExpanded: true,
                 value: _currency,
                 decoration: const InputDecoration(
                   labelText: 'Para Birimi',
@@ -110,7 +111,11 @@ class _AddCashAccountDialogState extends State<AddCashAccountDialog> {
                 items: AppConstants.supportedCurrencies.map((c) {
                   return DropdownMenuItem(
                     value: c,
-                    child: Text('$c (${AppConstants.currencySymbol(c)})'),
+                    child: Text(
+                      '$c (${AppConstants.currencySymbol(c)})',
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                   );
                 }).toList(),
                 onChanged: (val) {

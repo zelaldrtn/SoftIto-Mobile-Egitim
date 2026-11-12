@@ -58,34 +58,38 @@ class BudgetProgressCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    category,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.2,
-                      color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      statusText,
+              Expanded(
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 4,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      category,
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: statusColor,
+                        letterSpacing: -0.2,
+                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
                       ),
                     ),
-                  ),
-                ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: statusColor.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        statusText,
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: statusColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               if (onEditLimit != null)
                 InkWell(

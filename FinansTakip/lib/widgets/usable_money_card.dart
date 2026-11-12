@@ -150,40 +150,47 @@ class _UsableMoneyCardState extends State<UsableMoneyCard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.auto_awesome,
-                      color: AppColors.dreamyYellow,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Önerilen Günlük Bütçe',
-                          style: TextStyle(
-                            color: Color(0xFFC7DECE),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
+                Expanded(
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.auto_awesome,
+                        color: AppColors.dreamyYellow,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Önerilen Günlük Bütçe',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                color: Color(0xFFC7DECE),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              CurrencyFormatter.format(widget.dailyRecommended, showDecimals: false),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
                         ),
-                        Text(
-                          CurrencyFormatter.format(widget.dailyRecommended, showDecimals: false),
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
                 Container(
                   height: 24,
                   width: 1,
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
                   color: Colors.white.withOpacity(0.2),
                 ),
                 Column(

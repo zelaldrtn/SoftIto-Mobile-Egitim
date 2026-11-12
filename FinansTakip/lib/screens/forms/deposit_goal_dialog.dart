@@ -175,6 +175,7 @@ class _DepositGoalDialogState extends State<DepositGoalDialog> {
             if (_deductFromAccount) ...[
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
+                isExpanded: true,
                 value: _selectedCardId != null
                     ? 'card_$_selectedCardId'
                     : (_selectedCashAccountId != null ? 'cash_$_selectedCashAccountId' : null),
@@ -185,11 +186,19 @@ class _DepositGoalDialogState extends State<DepositGoalDialog> {
                 items: [
                   ...debitCards.map((c) => DropdownMenuItem(
                         value: 'card_${c.id}',
-                        child: Text('${c.cardName} (${CurrencyFormatter.format(c.currentBalance, currency: c.currency)})'),
+                        child: Text(
+                          '${c.cardName} (${CurrencyFormatter.format(c.currentBalance, currency: c.currency)})',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       )),
                   ...cashAccounts.map((a) => DropdownMenuItem(
                         value: 'cash_${a.id}',
-                        child: Text('${a.accountName} (${CurrencyFormatter.format(a.balance, currency: a.currency)})'),
+                        child: Text(
+                          '${a.accountName} (${CurrencyFormatter.format(a.balance, currency: a.currency)})',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       )),
                 ],
                 onChanged: (val) {
